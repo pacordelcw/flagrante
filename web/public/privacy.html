@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy — Flagrante</title>
+<meta name="description" content="What Flagrante collects, why, for how long, and how to make us delete it. Your SBOM is never stored.">
+<meta name="robots" content="index">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#FBFAF9; --panel:#FFFFFF; --sunk:#F1EFED;
+  --ink:#16130F; --muted:#5E574F; --faint:#8D857B;
+  --rule:#DFDAD4; --rule-firm:#C2BAB1;
+  --caught:#B32D22; --steady:#3F6B57; --steady-wash:#E7F0EB;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#131210; --panel:#1B1917; --sunk:#221F1C;
+    --ink:#F0EBE4; --muted:#A79E93; --faint:#7A7269;
+    --rule:#2C2825; --rule-firm:#413B36;
+    --caught:#FF7A67; --steady:#67B394; --steady-wash:#152622;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131210; --panel:#1B1917; --sunk:#221F1C;
+  --ink:#F0EBE4; --muted:#A79E93; --faint:#7A7269;
+  --rule:#2C2825; --rule-firm:#413B36;
+  --caught:#FF7A67; --steady:#67B394; --steady-wash:#152622;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:Chivo,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:0 24px 80px}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace}
+a{color:var(--caught)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--steady);outline-offset:2px}
+header.top{display:flex;align-items:center;justify-content:space-between;
+  padding:22px 0;border-bottom:1px solid var(--rule);gap:20px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--caught)}
+.top nav a{color:var(--muted);text-decoration:none;font-family:"JetBrains Mono",monospace;font-size:12px}
+h1{font-size:clamp(30px,5vw,42px);font-weight:800;letter-spacing:-.028em;line-height:1.1;
+  margin:52px 0 14px;text-wrap:balance}
+.updated{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);
+  letter-spacing:.04em;margin:0 0 34px}
+h2{font-size:21px;font-weight:800;letter-spacing:-.018em;margin:44px 0 10px;line-height:1.25}
+h3{font-size:16px;font-weight:600;margin:26px 0 6px}
+p{margin:0 0 15px}
+strong{font-weight:600}
+.lede{font-size:18px;color:var(--muted);margin:0 0 30px}
+.highlight{background:var(--steady-wash);border-left:3px solid var(--steady);padding:18px 20px;margin:0 0 26px}
+.highlight p:last-child{margin:0}
+table{width:100%;border-collapse:collapse;border:1px solid var(--rule);background:var(--panel);margin:0 0 22px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--rule);font-size:14.5px;vertical-align:top}
+th{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;background:var(--sunk)}
+tr:last-child td{border-bottom:none}
+ul{margin:0 0 18px;padding-left:22px}
+li{margin-bottom:9px}
+.forget{border:1px solid var(--rule-firm);background:var(--panel);padding:24px;margin:26px 0}
+.forget h3{margin-top:0}
+.forget button{padding:11px 20px;font-family:Chivo,sans-serif;font-size:15px;font-weight:600;
+  border:1px solid var(--caught);background:var(--caught);color:#fff;cursor:pointer}
+.forget button:disabled{opacity:.5;cursor:default}
+.forget .msg{font-family:"JetBrains Mono",monospace;font-size:12.5px;margin:12px 0 0;min-height:1.4em;color:var(--muted)}
+.forget .msg.ok{color:var(--steady)}
+.forget .id{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--faint);margin:0 0 14px}
+footer.end{border-top:1px solid var(--rule);margin-top:50px;padding:26px 0 0;
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);line-height:1.8}
+footer.end a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <a class="brand" href="/">Fla<span>grante</span></a>
+  <nav><a href="/">&larr; back to Flagrante</a></nav>
+</header>
+
+<h1>Privacy</h1>
+<p class="updated">Last updated 3 September 2026</p>
+
+<p class="lede">
+  Flagrante is a tool for people who are about to be held to a European regulation.
+  It would be absurd to run it on a site that quietly did the opposite of what it
+  preaches, so this page is specific rather than generic, and short enough to
+  actually read.
+</p>
+
+<div class="highlight">
+  <p><strong>Your SBOM is never stored.</strong> When you scan one here it is parsed
+  in memory, checked, and dropped when the request ends. It is not written to disk,
+  not logged, not retained, and not sent anywhere else. There is no storage layer in
+  the scanner at all, so there is nothing there to leak, subpoena, or breach. If you
+  would rather it never left your machine, <code>pip install flagrante</code> does
+  exactly the same thing locally.</p>
+</div>
+
+<h2>Who is responsible</h2>
+<p>
+  Flagrante is operated by an individual, not yet a company. For anything on this
+  page — access, deletion, objection, or a question — write to
+  <a href="mailto:privacy@flagrante.dev">privacy@flagrante.dev</a>. That address is
+  read by a person, and it is the same person who would fix whatever you report.
+</p>
+
+<h2>What is collected, and why</h2>
+
+<table>
+  <thead>
+    <tr><th>What</th><th>Why</th><th>Legal basis</th><th>Kept</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Your email</strong>, if you join the waitlist</td>
+      <td>To write to you once when the continuous version exists, and once more if the price changes before then. Nothing else.</td>
+      <td>Consent — you typed it in and pressed a button</td>
+      <td>Until you ask us to delete it, or until the project is abandoned</td>
+    </tr>
+    <tr>
+      <td><strong>A random number</strong> stored in your browser</td>
+      <td>To tell a returning visitor from a new one. Whether people come back is the single measurement this experiment turns on.</td>
+      <td>Consent — asked before it is set, and the site works identically if you decline</td>
+      <td>13 months, or until you clear it</td>
+    </tr>
+    <tr>
+      <td><strong>Country and referring site</strong>, when that number is set</td>
+      <td>To know which channel and which countries this reaches. Country comes from Cloudflare; only the referring host is kept, never the full URL.</td>
+      <td>Consent, with the above</td>
+      <td>13 months</td>
+    </tr>
+    <tr>
+      <td><strong>Two optional survey answers</strong> after a scan</td>
+      <td>To learn what kind of company this is actually for. Stored with the counts from your scan, never the component list.</td>
+      <td>Consent — the questions are optional and skipping them changes nothing</td>
+      <td>Until the project is abandoned</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>What is deliberately not collected</h3>
+<ul>
+  <li><strong>Your SBOM, or any part of it.</strong> Not the file, not the component list, not the package names. The survey record keeps only counts.</li>
+  <li><strong>Your IP address.</strong> It is used in transit to apply rate limits and is never written down.</li>
+  <li><strong>Cookies.</strong> There are none. The random number lives in your browser's own storage and never travels in a request header.</li>
+  <li><strong>Anything from advertising or tracking networks.</strong> There are no third-party scripts on this site, no analytics product, no pixels, no ad tech. The two fonts are the only external request the page makes.</li>
+</ul>
+
+<h2>Where it lives</h2>
+<p>
+  In a Cloudflare D1 database with its primary location in <strong>Western
+  Europe</strong>. That was a deliberate choice: most of the people this is built
+  for are EU manufacturers, and it would be strange to sell European compliance
+  while keeping European data somewhere else. Cloudflare processes it on our behalf
+  and does nothing else with it. Nobody else receives it, and it is never sold,
+  shared, or used to build a profile.
+</p>
+
+<h2>Your rights, and how to actually use them</h2>
+<p>
+  If you are in the EU or UK you can ask for a copy of what we hold, ask for it to
+  be corrected, ask for it to be deleted, withdraw consent, or object. In practice
+  there are two ways, and the first one is instant:
+</p>
+
+<div class="forget">
+  <h3>Delete this browser's record now</h3>
+  <p class="id" id="forget-id">Checking what is stored for this browser...</p>
+  <p>This erases the random number from your browser and deletes the matching row
+  from the database. No email, no ticket, no waiting. It cannot delete a waitlist
+  entry, because that is tied to your email address rather than to this browser.</p>
+  <button type="button" id="forget-btn">Delete it</button>
+  <p class="msg" id="forget-msg"></p>
+</div>
+
+<p>
+  For anything else — a copy of your data, deleting a waitlist entry, or a
+  complaint — write to <a href="mailto:privacy@flagrante.dev">privacy@flagrante.dev</a>.
+  We will answer within 30 days, which is what the GDPR requires, and normally much
+  sooner because there is very little data to look through.
+</p>
+<p>
+  You also have the right to complain to your national data protection authority if
+  you think we have got this wrong.
+</p>
+
+<h2>Changes</h2>
+<p>
+  If this page changes materially, the date at the top changes with it, and anyone
+  on the waitlist gets told. This site is
+  <a href="https://github.com/pacordelcw/flagrante">open source</a>, so the full
+  history of this page is public and you can check what changed rather than take
+  our word for it.
+</p>
+
+<footer class="end">
+  Flagrante — caught in the act, not merely vulnerable.<br>
+  Exposure indicator only. Not a conformity assessment, not legal advice, and not a
+  determination that no reporting obligation exists.
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var idEl = document.getElementById('forget-id');
+  var btn = document.getElementById('forget-btn');
+  var msg = document.getElementById('forget-msg');
+  var KEYS = ['flagrante.vid', 'flagrante.bucket', 'flagrante.consent'];
+
+  function read(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  var id = read('flagrante.vid');
+  if (id) {
+    idEl.textContent = 'This browser is stored as ' + id;
+  } else {
+    idEl.textContent = 'Nothing is stored for this browser. There is nothing to delete.';
+    btn.disabled = true;
+  }
+
+  btn.addEventListener('click', function () {
+    btn.disabled = true;
+    msg.className = 'msg';
+    msg.textContent = 'Deleting...';
+
+    fetch('/api/forget', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+    })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function () {
+        KEYS.forEach(function (k) {
+          try { localStorage.removeItem(k); } catch (e) {}
+        });
+        msg.className = 'msg ok';
+        msg.textContent = 'Deleted, from your browser and from the database.';
+        idEl.textContent = 'Nothing is stored for this browser.';
+      })
+      .catch(function () {
+        msg.className = 'msg';
+        msg.textContent = 'That did not go through. Write to privacy@flagrante.dev and we will do it by hand.';
+        btn.disabled = false;
+      });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -116,6 +116,20 @@ table.tiers td:first-child{font-weight:600;white-space:nowrap}
 .dot.c{background:var(--caught)} .dot.e{background:var(--elevated)}
 .dot.m{background:var(--rule-firm)} .dot.u{background:var(--faint)}
 
+/* ---- consent ---- */
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--panel);
+  border-top:2px solid var(--ink);padding:18px 24px;display:none}
+.consent.show{display:block}
+.consent-in{max-width:900px;margin:0 auto;display:flex;gap:18px;align-items:center;
+  justify-content:space-between;flex-wrap:wrap}
+.consent p{margin:0;font-size:14.5px;color:var(--muted);max-width:62ch;line-height:1.55}
+.consent p strong{color:var(--ink);font-weight:600}
+.consent .acts{display:flex;gap:9px;flex-shrink:0}
+.consent button{padding:9px 18px;font-family:Chivo,sans-serif;font-size:14.5px;font-weight:600;
+  cursor:pointer;border:1px solid var(--rule-firm);background:var(--ground);color:var(--ink)}
+.consent button.yes{background:var(--caught);border-color:var(--caught);color:#fff}
+.consent a{color:var(--caught)}
+
 /* ---- hosted scan ---- */
 .drop{border:2px dashed var(--rule-firm);background:var(--panel);padding:38px 28px;
   text-align:center;transition:border-color .15s,background .15s}
@@ -420,10 +434,25 @@ ARTICLE 14 CASCADE
   <a href="https://www.first.org/epss/">FIRST EPSS</a>. Apache-2.0.<br>
   Exposure indicator only. Not a conformity assessment, not legal advice, and not a
   determination that no reporting obligation exists.<br>
-  This page keeps one random number in your browser so we can tell a returning
-  visitor from a new one. No cookies, no account, no email, no IP address, and
-  nothing that identifies you. Clearing your site data erases it completely.
+  <a href="/privacy">Privacy</a> &mdash; what we collect, why, and a button
+  that deletes it. Your SBOM is never stored, anywhere, at any point.
 </footer>
+
+<div class="consent" id="consent" role="dialog" aria-live="polite" aria-label="Measurement consent">
+  <div class="consent-in">
+    <p>
+      May we keep <strong>one random number in your browser</strong> so we can tell a
+      returning visitor from a new one? That is the only thing this experiment
+      measures. No cookies, no account, no email, no IP address, nothing that
+      identifies you &mdash; and <strong>the scanner works exactly the same either
+      way</strong>. <a href="/privacy">What we collect</a>.
+    </p>
+    <div class="acts">
+      <button type="button" id="consent-no">No thanks</button>
+      <button type="button" class="yes" id="consent-yes">Allow</button>
+    </div>
+  </div>
+</div>
 
 </div>
 
@@ -437,47 +466,46 @@ ARTICLE 14 CASCADE
 window.FLAGRANTE = (function () {
   var ID_KEY = 'flagrante.vid';
   var BUCKET_KEY = 'flagrante.bucket';
+  var CONSENT_KEY = 'flagrante.consent';
 
-  // Two prices, assigned once and then held for the life of that browser.
-  // Showing a returning visitor a different number than last time would be
-  // both dishonest and useless as a measurement.
   var PRICES = {
     a: { amount: '€149', unit: 'per product line / month', value: 149 },
     b: { amount: '€490', unit: 'per product line / month', value: 490 }
   };
 
-  function store(key, value) {
-    try { localStorage.setItem(key, value); } catch (e) { /* private window */ }
-  }
-  function load(key) {
-    try { return localStorage.getItem(key); } catch (e) { return null; }
-  }
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
   function newId() {
     try {
-      var bytes = new Uint8Array(12);
-      crypto.getRandomValues(bytes);
-      return Array.prototype.map
-        .call(bytes, function (b) { return ('0' + b.toString(16)).slice(-2); })
-        .join('');
+      var b = new Uint8Array(12);
+      crypto.getRandomValues(b);
+      return Array.prototype.map.call(b, function (x) {
+        return ('0' + x.toString(16)).slice(-2);
+      }).join('');
     } catch (e) {
       return (Date.now().toString(36) + Math.random().toString(36).slice(2, 14))
         .replace(/[^a-z0-9]/g, '').slice(0, 24);
     }
   }
 
-  var id = load(ID_KEY);
-  var isNew = !id;
-  if (isNew) { id = newId(); store(ID_KEY, id); }
+  var consent = load(CONSENT_KEY);            // 'yes', 'no', or null
+  var id = consent === 'yes' ? load(ID_KEY) : null;
 
-  var bucket = load(BUCKET_KEY);
+  // The price arm is decided regardless, so the page never shows one visitor two
+  // different prices. It is only persisted with consent; without it the choice
+  // lives in memory for this page view and nothing is written down.
+  var bucket = consent === 'yes' ? load(BUCKET_KEY) : null;
   if (bucket !== 'a' && bucket !== 'b') {
     bucket = Math.random() < 0.5 ? 'a' : 'b';
-    store(BUCKET_KEY, bucket);
+    if (consent === 'yes') store(BUCKET_KEY, bucket);
   }
 
   function ping(event) {
-    // keepalive so a ping fired as the page unloads still lands.
+    // No consent, no identifier, no request. Not a disabled feature: there is
+    // simply nothing to send.
+    if (consent !== 'yes') return;
+    if (!id) { id = newId(); store(ID_KEY, id); }
     try {
       fetch('/api/visit', {
         method: 'POST',
@@ -485,27 +513,49 @@ window.FLAGRANTE = (function () {
         body: JSON.stringify({ id: id, event: event, price_bucket: bucket }),
         keepalive: true
       }).catch(function () {});
-    } catch (e) { /* tracking must never break the page */ }
+    } catch (e) {}
   }
 
   function paintPrice() {
-    var price = PRICES[bucket];
-    var amount = document.getElementById('price-amount');
-    var unit = document.getElementById('price-unit');
-    if (amount) amount.textContent = price.amount;
-    if (unit) unit.textContent = price.unit;
+    var p = PRICES[bucket];
+    var a = document.getElementById('price-amount');
+    var u = document.getElementById('price-unit');
+    if (a) a.textContent = p.amount;
+    if (u) u.textContent = p.unit;
+  }
+
+  function decide(answer) {
+    consent = answer;
+    store(CONSENT_KEY, answer);
+    var box = document.getElementById('consent');
+    if (box) box.classList.remove('show');
+    if (answer === 'yes') {
+      store(BUCKET_KEY, bucket);
+      ping('visit');
+    }
+  }
+
+  function wire() {
+    paintPrice();
+    var box = document.getElementById('consent');
+    if (!box) return;
+    document.getElementById('consent-yes').addEventListener('click', function () { decide('yes'); });
+    document.getElementById('consent-no').addEventListener('click', function () { decide('no'); });
+    // Ask only if they have not already answered.
+    if (consent !== 'yes' && consent !== 'no') box.classList.add('show');
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', paintPrice);
+    document.addEventListener('DOMContentLoaded', wire);
   } else {
-    paintPrice();
+    wire();
   }
   ping('visit');
 
   return {
-    id: id,
+    get id() { return id; },
     bucket: bucket,
+    get consented() { return consent === 'yes'; },
     price: function () { return PRICES[bucket]; },
     ping: ping
   };
@@ -717,7 +767,9 @@ window.FLAGRANTE = (function () {
         email: email,
         price_shown: window.FLAGRANTE ? window.FLAGRANTE.price().value : null,
         price_bucket: window.FLAGRANTE ? window.FLAGRANTE.bucket : null,
-        visitor_id: window.FLAGRANTE ? window.FLAGRANTE.id : null,
+        // Only when they allowed the identifier; otherwise the email stands alone.
+        visitor_id: (window.FLAGRANTE && window.FLAGRANTE.consented)
+          ? window.FLAGRANTE.id : null,
         currency: 'EUR'
       })
     })
