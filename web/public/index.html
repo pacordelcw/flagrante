@@ -524,7 +524,28 @@ window.FLAGRANTE = (function () {
     if (u) u.textContent = p.unit;
   }
 
+  function forget(existing) {
+    // Withdrawing consent has to erase what is already there, not merely stop
+    // adding to it. Someone who had agreed before -- or who arrives with an id
+    // from an earlier visit -- is saying "delete this", and leaving the value
+    // sitting in their browser would make the button a lie.
+    try {
+      localStorage.removeItem(ID_KEY);
+      localStorage.removeItem(BUCKET_KEY);
+    } catch (e) {}
+    if (!existing) return;
+    try {
+      fetch('/api/forget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: existing }),
+        keepalive: true
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   function decide(answer) {
+    var previous = id || load(ID_KEY);
     consent = answer;
     store(CONSENT_KEY, answer);
     var box = document.getElementById('consent');
@@ -532,6 +553,9 @@ window.FLAGRANTE = (function () {
     if (answer === 'yes') {
       store(BUCKET_KEY, bucket);
       ping('visit');
+    } else {
+      id = null;
+      forget(previous);
     }
   }
 
