@@ -10,7 +10,7 @@
       "name": "example-gateway",
       "version": "2.4.0"
     },
-    "tools": [{ "vendor": "redhand", "name": "sample", "version": "0.1.0" }]
+    "tools": [{ "vendor": "flagrante", "name": "sample", "version": "0.1.0" }]
   },
   "components": [
     {

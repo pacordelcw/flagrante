@@ -1,4 +1,4 @@
-"""redhand -- which of your components start a CRA Article 14 24-hour clock."""
+"""flagrante -- which of your components start a CRA Article 14 24-hour clock."""
 
 __version__ = "0.1.0"
 

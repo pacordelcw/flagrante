@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Redhand — which components start your CRA 24-hour clock</title>
-<meta name="description" content="Thousands of your dependencies are vulnerable. A few dozen are being exploited. Only those start a Cyber Resilience Act Article 14 reporting clock. Redhand tells you which.">
-<meta property="og:title" content="Redhand — caught in the act, not merely vulnerable">
-<meta property="og:description" content="Article 14 gives you 24 hours from awareness of an actively exploited vulnerability. Every other scanner shows you vulnerabilities. Redhand shows you exploitation.">
+<title>Flagrante — which components start your CRA 24-hour clock</title>
+<meta name="description" content="Thousands of your dependencies are vulnerable. A few dozen are being exploited. Only those start a Cyber Resilience Act Article 14 reporting clock. Flagrante tells you which.">
+<meta property="og:title" content="Flagrante — caught in the act, not merely vulnerable">
+<meta property="og:description" content="Article 14 gives you 24 hours from awareness of an actively exploited vulnerability. Every other scanner shows you vulnerabilities. Flagrante shows you exploitation.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -220,7 +220,7 @@ footer.end a{color:var(--muted)}
   <nav>
     <a href="#how">How it decides</a>
     <a href="#limits">Limits</a>
-    <a href="https://github.com/pacordelcw/redhand">GitHub</a>
+    <a href="https://github.com/pacordelcw/flagrante">GitHub</a>
   </nav>
 </header>
 
@@ -231,18 +231,18 @@ footer.end a{color:var(--muted)}
     Your SBOM has hundreds of components carrying thousands of known CVEs. A few dozen
     of those CVEs are actually being exploited in the wild right now. <strong>Only that
     second group starts a 24-hour reporting clock.</strong> Every other scanner shows you
-    the first. Redhand shows you the difference.
+    the first. Flagrante shows you the difference.
   </p>
   <div class="install">
-    <code>pip install redhand</code>
+    <code>pip install flagrante</code>
     <span class="arrow">then</span>
-    <code>syft dir:. -o cyclonedx-json | redhand</code>
+    <code>syft dir:. -o cyclonedx-json | flagrante</code>
   </div>
   <p class="install-note">Free. No account. No dependencies. Works offline against cached feeds.</p>
 </div>
 
 <div class="term">
-<pre><span class="d">$ syft dir:. -o cyclonedx-json | redhand</span>
+<pre><span class="d">$ syft dir:. -o cyclonedx-json | flagrante</span>
 
 <span class="r">24-HOUR CLOCK LIKELY RUNNING  (2)</span>
 <span class="d">  Confirmed exploited in the wild -- CISA KEV</span>
@@ -307,7 +307,7 @@ ARTICLE 14 CASCADE
 <section id="how">
   <h2>How it decides</h2>
   <p class="sub">
-    Three public feeds, no API keys, no account. Redhand does not generate your
+    Three public feeds, no API keys, no account. Flagrante does not generate your
     SBOM — syft and cdxgen already do that well and for free. It answers the one
     question they do not.
   </p>
@@ -388,7 +388,7 @@ ARTICLE 14 CASCADE
 </section>
 
 <section id="limits" class="limits">
-  <h2>What Redhand is not</h2>
+  <h2>What Flagrante is not</h2>
   <p class="sub">
     A tool in this space that hides its limits is not worth trusting with a
     €15 million reporting obligation. Three, stated plainly:
@@ -407,14 +407,14 @@ ARTICLE 14 CASCADE
       suite fails the build if a future change ever softens the wording into reassurance.</li>
   </ol>
   <p class="small" style="margin-top:22px">
-    If a feed is unreachable, Redhand refuses to print a result rather than printing an
+    If a feed is unreachable, Flagrante refuses to print a result rather than printing an
     empty one. An unreachable exploitation feed and a clean scan look identical and mean
     opposite things.
   </p>
 </section>
 
 <footer class="end">
-  Redhand — caught in the act, not merely vulnerable.<br>
+  Flagrante — caught in the act, not merely vulnerable.<br>
   Built on <a href="https://osv.dev">OSV</a>,
   <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">CISA KEV</a> and
   <a href="https://www.first.org/epss/">FIRST EPSS</a>. Apache-2.0.<br>
@@ -434,9 +434,9 @@ ARTICLE 14 CASCADE
    localStorage -- no cookie, no account, no IP kept, nothing identifying.
    Someone who returns on another machine or clears storage counts as new,
    so the measured rate is a floor, never an inflated ceiling.            */
-window.REDHAND = (function () {
-  var ID_KEY = 'redhand.vid';
-  var BUCKET_KEY = 'redhand.bucket';
+window.FLAGRANTE = (function () {
+  var ID_KEY = 'flagrante.vid';
+  var BUCKET_KEY = 'flagrante.bucket';
 
   // Two prices, assigned once and then held for the life of that browser.
   // Showing a returning visitor a different number than last time would be
@@ -514,9 +514,9 @@ window.REDHAND = (function () {
 /* ---- hosted scan ------------------------------------------------------- */
 (function () {
   // Overridden at deploy time; falls back to the local server during dev.
-  var SCANNER = window.REDHAND_SCANNER ||
-    (location.hostname === 'redhand.dev' || location.hostname === 'www.redhand.dev'
-      ? 'https://scan.redhand.dev'
+  var SCANNER = window.FLAGRANTE_SCANNER ||
+    (location.hostname === 'flagrante.dev' || location.hostname === 'www.flagrante.dev'
+      ? 'https://scan.flagrante.dev'
       : 'http://127.0.0.1:8904');
 
   var drop = document.getElementById('drop');
@@ -608,7 +608,7 @@ window.REDHAND = (function () {
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'redhand-' + (result.subject || 'sbom').replace(/[^a-z0-9._-]/gi, '-') + '.html';
+      a.download = 'flagrante-' + (result.subject || 'sbom').replace(/[^a-z0-9._-]/gi, '-') + '.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -642,7 +642,7 @@ window.REDHAND = (function () {
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
       fail('That SBOM is over 5 MB. ',
-        'The hosted scanner caps there. Run it locally instead, unmetered: pip install redhand');
+        'The hosted scanner caps there. Run it locally instead, unmetered: pip install flagrante');
       return;
     }
 
@@ -664,7 +664,7 @@ window.REDHAND = (function () {
     }).then(function (body) {
       // A completed scan is a qualified activation: the denominator of the
       // return rate. Mere page views do not count.
-      if (window.REDHAND) window.REDHAND.ping('scan');
+      if (window.FLAGRANTE) window.FLAGRANTE.ping('scan');
       render(body.result, body.html);
     }).catch(function (error) {
       fail('That did not work. ', error.message || 'The scanner could not be reached.');
@@ -715,9 +715,9 @@ window.REDHAND = (function () {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: email,
-        price_shown: window.REDHAND ? window.REDHAND.price().value : null,
-        price_bucket: window.REDHAND ? window.REDHAND.bucket : null,
-        visitor_id: window.REDHAND ? window.REDHAND.id : null,
+        price_shown: window.FLAGRANTE ? window.FLAGRANTE.price().value : null,
+        price_bucket: window.FLAGRANTE ? window.FLAGRANTE.bucket : null,
+        visitor_id: window.FLAGRANTE ? window.FLAGRANTE.id : null,
         currency: 'EUR'
       })
     })
@@ -732,7 +732,7 @@ window.REDHAND = (function () {
       })
       .catch(function () {
         msg.className = 'form-msg err';
-        msg.textContent = 'That did not go through. Try again, or mail hello@redhand.dev.';
+        msg.textContent = 'That did not go through. Try again, or mail hello@flagrante.dev.';
       })
       .finally(function () {
         button.disabled = false;

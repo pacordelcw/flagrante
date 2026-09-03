@@ -1,4 +1,4 @@
-# Deploying redhand.dev
+# Deploying flagrante.dev
 
 Total running cost: **the domain only.** Everything else sits inside free tiers
 that permit commercial use, which is why this stack was chosen over Vercel —
@@ -23,13 +23,13 @@ npm install -g wrangler
 wrangler login
 
 # 1. Create the database and paste the returned id into wrangler.toml
-wrangler d1 create redhand
+wrangler d1 create flagrante
 
 # 2. Apply the schema
-wrangler d1 execute redhand --remote --file=schema.sql
+wrangler d1 execute flagrante --remote --file=schema.sql
 
 # 3. Ship
-wrangler pages deploy . --project-name=redhand
+wrangler pages deploy . --project-name=flagrante
 ```
 
 Then in the Cloudflare dashboard, bind the D1 database to the Pages project as
@@ -58,7 +58,7 @@ of addresses.
 The scanner is stateless and stores nothing. Deploy from the repo root:
 
 ```bash
-gcloud run deploy redhand-scan \
+gcloud run deploy flagrante-scan \
   --source . \
   --region europe-west1 \
   --allow-unauthenticated \
@@ -75,9 +75,9 @@ includes the KEV download, so the first scan after an idle period is slow.
 `europe-west1` because the users are EU manufacturers and the SBOM should not
 take a detour across the Atlantic even though it is never stored.
 
-Then map `scan.redhand.dev` to the service and point the landing at it. The page
-picks the URL up from `window.REDHAND_SCANNER` if set, otherwise defaults to
-`https://scan.redhand.dev` in production and `http://127.0.0.1:8904` in dev.
+Then map `scan.flagrante.dev` to the service and point the landing at it. The page
+picks the URL up from `window.FLAGRANTE_SCANNER` if set, otherwise defaults to
+`https://scan.flagrante.dev` in production and `http://127.0.0.1:8904` in dev.
 
 Add the production origin to `ALLOWED_ORIGINS` in `server/app.py` before
 deploying, or the browser will refuse the response.
@@ -162,7 +162,7 @@ would rather stop a marginal business than continue one on a flattered number.
 ## What is not built yet
 
 - **Rate limiting that survives scale-out.** The in-process limiter only binds
-  one instance; Cloudflare rate limiting in front of `scan.redhand.dev` is the
+  one instance; Cloudflare rate limiting in front of `scan.flagrante.dev` is the
   real control.
 - **No email is ever sent.** The waitlist collects addresses and nothing
   delivers to them. Before the first send, that needs a real sender identity

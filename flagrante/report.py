@@ -61,7 +61,7 @@ def render(assessment: Assessment, stream=sys.stdout, show_monitor: bool = False
     doc = assessment.document
     subject = doc.subject or "(unnamed)"
     write()
-    write(style(f"redhand  ~  {subject}", "bold"))
+    write(style(f"flagrante  ~  {subject}", "bold"))
     write(
         style(
             f"{doc.format} {doc.spec_version or ''}".strip()

@@ -9,7 +9,7 @@ It is parsed in memory, scanned, and dropped when the request ends. There is no
 storage layer here to leak, because there is no storage layer.
 
 **The web result cannot drift from the terminal result.** Both call
-``redhand.scan`` and both render through ``redhand.html``. If the hosted answer
+``flagrante.scan`` and both render through ``flagrante.html``. If the hosted answer
 ever disagreed with the answer someone got locally, the tool would be worthless
 for the one thing it exists to support.
 
@@ -31,13 +31,13 @@ from typing import Any
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from redhand import __version__
-from redhand.html import render_html
-from redhand.sbom import SBOMError, parse
-from redhand.scan import scan_document
-from redhand.sources import FeedError, fetch_kev
+from flagrante import __version__
+from flagrante.html import render_html
+from flagrante.sbom import SBOMError, parse
+from flagrante.scan import scan_document
+from flagrante.sources import FeedError, fetch_kev
 
-log = logging.getLogger("redhand.server")
+log = logging.getLogger("flagrante.server")
 
 # A 5 MB SBOM is already enormous; beyond that something is wrong or hostile.
 MAX_BODY_BYTES = 5 * 1024 * 1024
@@ -56,8 +56,8 @@ DRAIN_CEILING_BYTES = 24 * 1024 * 1024
 DRAIN_CHUNK = 64 * 1024
 
 ALLOWED_ORIGINS = {
-    "https://redhand.dev",
-    "https://www.redhand.dev",
+    "https://flagrante.dev",
+    "https://www.flagrante.dev",
     "http://127.0.0.1:8901",
     "http://localhost:8901",
 }
@@ -120,7 +120,7 @@ def _summary(assessment: Any) -> dict[str, Any]:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = f"redhand/{__version__}"
+    server_version = f"flagrante/{__version__}"
     protocol_version = "HTTP/1.1"
 
     # -- plumbing ---------------------------------------------------------
@@ -223,7 +223,7 @@ class Handler(BaseHTTPRequestHandler):
                 413,
                 {
                     "error": f"SBOM larger than {MAX_BODY_BYTES // (1024 * 1024)} MB. "
-                    "Run the CLI locally instead: pip install redhand"
+                    "Run the CLI locally instead: pip install flagrante"
                 },
                 close=not drained,
             )
@@ -246,7 +246,7 @@ class Handler(BaseHTTPRequestHandler):
                         f"{identifiable} identifiable components exceeds the hosted "
                         f"limit of {MAX_COMPONENTS}. We will not run a partial scan "
                         "and report it as a whole one. Run it locally, unmetered: "
-                        "pip install redhand"
+                        "pip install flagrante"
                     )
                 },
             )
@@ -300,7 +300,7 @@ def main() -> int:
 
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     server.daemon_threads = True
-    log.info("redhand %s listening on :%d", __version__, port)
+    log.info("flagrante %s listening on :%d", __version__, port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

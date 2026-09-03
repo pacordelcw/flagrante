@@ -32,7 +32,7 @@ KEV_URL = (
 )
 EPSS_URL = "https://api.first.org/data/v1/epss"
 
-USER_AGENT = "redhand/0.1 (CRA Article 14 exposure checker)"
+USER_AGENT = "flagrante/0.1 (CRA Article 14 exposure checker)"
 CACHE_TTL_SECONDS = 6 * 3600
 
 
@@ -41,7 +41,7 @@ class FeedError(RuntimeError):
 
 
 def _cache_dir() -> Path:
-    root = os.environ.get("REDHAND_CACHE") or (Path.home() / ".cache" / "redhand")
+    root = os.environ.get("FLAGRANTE_CACHE") or (Path.home() / ".cache" / "flagrante")
     path = Path(root)
     path.mkdir(parents=True, exist_ok=True)
     return path

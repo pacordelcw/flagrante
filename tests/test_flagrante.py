@@ -15,9 +15,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from redhand.classify import Tier, assess
-from redhand.sbom import SBOMError, parse
-from redhand.sources import KevEntry, Vulnerability
+from flagrante.classify import Tier, assess
+from flagrante.sbom import SBOMError, parse
+from flagrante.sources import KevEntry, Vulnerability
 
 
 def cyclonedx(components: list[dict], name: str = "unit-under-test") -> str:

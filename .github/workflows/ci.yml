@@ -40,7 +40,7 @@ jobs:
           # Log4Shell, so a default run exits 1 by design and `bash -e` would
           # kill the step before any assertion ran. We want the findings, not
           # the gate.
-          python -m redhand.cli samples/sample-cyclonedx.json --json --fail-on never > result.json
+          python -m flagrante.cli samples/sample-cyclonedx.json --json --fail-on never > result.json
           python - <<'PY'
           import json, sys
           r = json.load(open("result.json"))

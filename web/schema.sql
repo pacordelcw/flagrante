@@ -1,5 +1,5 @@
--- D1 schema for the Redhand waitlist.
--- Apply with:  wrangler d1 execute redhand --remote --file=schema.sql
+-- D1 schema for the Flagrante waitlist.
+-- Apply with:  wrangler d1 execute flagrante --remote --file=schema.sql
 
 CREATE TABLE IF NOT EXISTS waitlist (
   email         TEXT PRIMARY KEY,

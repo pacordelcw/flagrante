@@ -17,9 +17,9 @@ from datetime import datetime
 
 from .classify import Assessment, Finding, Tier, early_warning_fields
 
-BRAND = "Redhand"
+BRAND = "Flagrante"
 TAGLINE = "Caught in the act, not merely vulnerable"
-SITE = "redhand.dev"
+SITE = "flagrante.dev"
 
 _STYLE = """
 :root{
@@ -315,8 +315,8 @@ def render_html(assessment: Assessment, scan_url: str | None = None) -> str:
         '<div class="cta">'
         "<p>This is a snapshot. Exploitation status changes daily, and the 24-hour "
         "window starts from awareness &mdash; not from your next scan.</p>"
-        f"<p><code>pip install redhand</code> &nbsp; then &nbsp; "
-        f"<code>syft dir:. -o cyclonedx-json | redhand</code></p>"
+        f"<p><code>pip install flagrante</code> &nbsp; then &nbsp; "
+        f"<code>syft dir:. -o cyclonedx-json | flagrante</code></p>"
         f"<p>Continuous watching and a dated evidence trail: {cta_link}</p>"
         "</div>"
     )

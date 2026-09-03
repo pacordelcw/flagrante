@@ -4,18 +4,18 @@ FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    REDHAND_CACHE=/tmp/redhand-cache
+    FLAGRANTE_CACHE=/tmp/flagrante-cache
 
 WORKDIR /srv
-COPY redhand/ ./redhand/
+COPY flagrante/ ./flagrante/
 COPY server/app.py ./server/app.py
 
 # Run unprivileged. /tmp is the only writable path the process needs, and it
 # holds nothing but the public KEV feed cache.
-RUN useradd --system --uid 10001 redhand \
- && mkdir -p /tmp/redhand-cache \
- && chown -R redhand:redhand /srv /tmp/redhand-cache
-USER redhand
+RUN useradd --system --uid 10001 flagrante \
+ && mkdir -p /tmp/flagrante-cache \
+ && chown -R flagrante:flagrante /srv /tmp/flagrante-cache
+USER flagrante
 
 EXPOSE 8080
 CMD ["python", "-u", "server/app.py"]

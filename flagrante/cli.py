@@ -20,7 +20,7 @@ EXIT_ERROR = 3
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="redhand",
+        prog="flagrante",
         description=(
             "Find which components in an SBOM carry vulnerabilities confirmed "
             "exploited in the wild -- the ones that start a CRA Article 14 "
@@ -74,8 +74,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.sbom == "-":
             if sys.stdin.isatty():
                 print(
-                    "redhand: reading an SBOM from stdin; pass a file path or pipe one in.\n"
-                    "         try:  syft dir:. -o cyclonedx-json | redhand",
+                    "flagrante: reading an SBOM from stdin; pass a file path or pipe one in.\n"
+                    "         try:  syft dir:. -o cyclonedx-json | flagrante",
                     file=sys.stderr,
                 )
                 return EXIT_ERROR
@@ -84,19 +84,19 @@ def main(argv: list[str] | None = None) -> int:
             assessment = scan_file(args.sbom, progress, args.refresh)
 
     except SBOMError as exc:
-        print(f"redhand: cannot read that SBOM -- {exc}", file=sys.stderr)
+        print(f"flagrante: cannot read that SBOM -- {exc}", file=sys.stderr)
         return EXIT_ERROR
     except FeedError as exc:
         # Never degrade to a clean result: an unreachable exploitation feed and
         # an empty one look identical and mean opposite things.
         print(
-            f"redhand: {exc}\n"
+            f"flagrante: {exc}\n"
             "         Refusing to report a result without the exploitation feeds.",
             file=sys.stderr,
         )
         return EXIT_ERROR
     except FileNotFoundError:
-        print(f"redhand: no such file: {args.sbom}", file=sys.stderr)
+        print(f"flagrante: no such file: {args.sbom}", file=sys.stderr)
         return EXIT_ERROR
     except KeyboardInterrupt:
         return EXIT_ERROR

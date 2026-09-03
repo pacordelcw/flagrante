@@ -1,4 +1,4 @@
-# redhand
+# flagrante
 
 **Which of your components start a CRA Article 14 24-hour clock.**
 
@@ -10,7 +10,7 @@ Every SBOM scanner on the market tells you which components are *vulnerable*.
 That is not the question Article 14 asks. Thousands of CVEs are vulnerabilities;
 a few hundred are being exploited. Only the second group starts a clock.
 
-`redhand` makes that distinction the whole output.
+`flagrante` makes that distinction the whole output.
 
 ```
 24-HOUR CLOCK LIKELY RUNNING  (2)
@@ -36,22 +36,22 @@ ARTICLE 14 CASCADE
 
 ## Use it
 
-You need an SBOM. If you do not have one, generate it free — `redhand` does not
+You need an SBOM. If you do not have one, generate it free — `flagrante` does not
 duplicate that job, because [syft](https://github.com/anchore/syft) and
 [cdxgen](https://github.com/CycloneDX/cdxgen) already do it well.
 
 ```bash
-pip install redhand
-syft dir:. -o cyclonedx-json | redhand
+pip install flagrante
+syft dir:. -o cyclonedx-json | flagrante
 ```
 
 Or against a file, in CI, or as JSON:
 
 ```bash
-redhand sbom.json
-redhand sbom.json --json > result.json
-redhand sbom.json --all          # include findings with no exploitation signal
-redhand sbom.json --fail-on urgent
+flagrante sbom.json
+flagrante sbom.json --json > result.json
+flagrante sbom.json --all          # include findings with no exploitation signal
+flagrante sbom.json --fail-on urgent
 ```
 
 Exit codes: `0` nothing at the chosen level, `1` confirmed exploited,
@@ -62,7 +62,7 @@ Exit codes: `0` nothing at the chosen level, `1` confirmed exploited,
 ```yaml
 - uses: actions/checkout@v4
 - run: syft dir:. -o cyclonedx-json > sbom.json
-- uses: pacordelcw/redhand@v1
+- uses: pacordelcw/flagrante@v1
   with:
     sbom: sbom.json
     fail-on: exploited
@@ -87,7 +87,7 @@ Three public feeds, no API keys:
 
 ## What this is not
 
-`redhand` is an **exposure indicator**. It is not a conformity assessment, not
+`flagrante` is an **exposure indicator**. It is not a conformity assessment, not
 legal advice, and not a determination that no reporting obligation exists.
 
 Three limits worth stating plainly, because a tool in this space that hides
@@ -108,7 +108,7 @@ them is not worth trusting:
    there is a test suite that fails the build if a future change ever softens
    the wording into reassurance.
 
-If a feed is unreachable, `redhand` refuses to print a result rather than
+If a feed is unreachable, `flagrante` refuses to print a result rather than
 printing an empty one — an unreachable exploitation feed and a clean scan look
 identical and mean opposite things.
 
