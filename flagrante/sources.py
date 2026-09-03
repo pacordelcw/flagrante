@@ -32,7 +32,11 @@ KEV_URL = (
 )
 EPSS_URL = "https://api.first.org/data/v1/epss"
 
-USER_AGENT = "flagrante/0.1 (CRA Article 14 exposure checker)"
+# Derived rather than written out, so the string the feeds see can never
+# drift from the version actually shipped.
+from . import __version__ as _version
+
+USER_AGENT = f"flagrante/{_version} (CRA Article 14 exposure checker; +https://flagrante.dev)"
 CACHE_TTL_SECONDS = 6 * 3600
 
 

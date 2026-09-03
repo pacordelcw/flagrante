@@ -4,18 +4,42 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flagrante"
-version = "0.1.0"
-description = "Which of your components start a CRA Article 14 24-hour reporting clock"
+version = "0.0.1"
+description = "Which of your components carry vulnerabilities confirmed exploited in the wild -- the ones that start a CRA Article 14 24-hour reporting clock"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
-keywords = ["cra", "cyber-resilience-act", "sbom", "kev", "epss", "compliance"]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Flagrante" }]
+keywords = [
+  "cra",
+  "cyber-resilience-act",
+  "article-14",
+  "sbom",
+  "cyclonedx",
+  "spdx",
+  "kev",
+  "epss",
+  "osv",
+  "vulnerability",
+  "compliance",
+  "eu",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
+  "Environment :: Console",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Legal Industry",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+  "Typing :: Typed",
 ]
 
 # No runtime dependencies, on purpose. This has to drop into any CI image
@@ -27,7 +51,10 @@ dependencies = []
 flagrante = "flagrante.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/pacordelcw/flagrante"
+Homepage = "https://flagrante.dev"
+Source = "https://github.com/pacordelcw/flagrante"
+Issues = "https://github.com/pacordelcw/flagrante/issues"
+Changelog = "https://github.com/pacordelcw/flagrante/commits/main"
 
 [tool.setuptools.packages.find]
 include = ["flagrante*"]

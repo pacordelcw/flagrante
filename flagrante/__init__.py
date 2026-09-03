@@ -1,6 +1,6 @@
 """flagrante -- which of your components start a CRA Article 14 24-hour clock."""
 
-__version__ = "0.1.0"
+__version__ = "0.0.1"
 
 from .classify import Assessment, Finding, Tier, assess, early_warning_fields
 from .sbom import Component, SBOMDocument, SBOMError, parse, parse_file
