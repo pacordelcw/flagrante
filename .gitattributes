@@ -1,0 +1,7 @@
+# Force LF everywhere. This repo ships a Dockerfile and a composite action whose
+# bash runs on Linux runners; CRLF in either produces errors that look like
+# nothing to do with line endings.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary

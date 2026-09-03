@@ -1,0 +1,62 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-03T00:00:00Z",
+    "component": {
+      "type": "application",
+      "name": "example-gateway",
+      "version": "2.4.0"
+    },
+    "tools": [{ "vendor": "redhand", "name": "sample", "version": "0.1.0" }]
+  },
+  "components": [
+    {
+      "type": "library",
+      "group": "org.apache.logging.log4j",
+      "name": "log4j-core",
+      "version": "2.14.1",
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "type": "library",
+      "group": "com.fasterxml.jackson.core",
+      "name": "jackson-databind",
+      "version": "2.9.8",
+      "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.9.8"
+    },
+    {
+      "type": "library",
+      "name": "lodash",
+      "version": "4.17.15",
+      "purl": "pkg:npm/lodash@4.17.15"
+    },
+    {
+      "type": "library",
+      "name": "requests",
+      "version": "2.19.1",
+      "purl": "pkg:pypi/requests@2.19.1"
+    },
+    {
+      "type": "library",
+      "name": "urllib3",
+      "version": "1.24.1",
+      "purl": "pkg:pypi/urllib3@1.24.1"
+    },
+    {
+      "type": "library",
+      "name": "vendor-crypto-blob",
+      "version": "1.0.3",
+      "description": "Third-party binary shipped without a package URL"
+    },
+    {
+      "type": "library",
+      "name": "internal-telemetry",
+      "version": "0.9.0",
+      "description": "First-party module, no upstream registry"
+    }
+  ]
+}

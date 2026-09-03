@@ -1,0 +1,100 @@
+name: "redhand — CRA Article 14 exposure check"
+description: >-
+  Check an SBOM for components carrying vulnerabilities confirmed exploited in
+  the wild — the ones that start a Cyber Resilience Act 24-hour reporting clock.
+author: "redhand"
+
+branding:
+  icon: "clock"
+  color: "red"
+
+inputs:
+  sbom:
+    description: "Path to a CycloneDX or SPDX JSON SBOM."
+    required: true
+  fail-on:
+    description: >-
+      When to fail the job: 'exploited' (default, confirmed exploited only),
+      'urgent' (also elevated exploitation probability), or 'never' (report only).
+    required: false
+    default: "exploited"
+  json-out:
+    description: "Optional path to write the machine-readable result to."
+    required: false
+    default: ""
+
+outputs:
+  clock-running:
+    description: "Number of vulnerabilities confirmed exploited in the wild."
+    value: ${{ steps.scan.outputs.clock-running }}
+  urgent:
+    description: "Number with elevated exploitation probability."
+    value: ${{ steps.scan.outputs.urgent }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install redhand
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+
+    - name: Scan SBOM
+      id: scan
+      shell: bash
+      run: |
+        set +e
+        json_path="${{ inputs.json-out }}"
+        if [ -z "$json_path" ]; then
+          json_path="$RUNNER_TEMP/redhand.json"
+        fi
+
+        redhand "${{ inputs.sbom }}" --json --fail-on never > "$json_path"
+        if [ $? -ne 0 ]; then
+          echo "::error::redhand could not complete the scan. Refusing to report a "\
+               "result without the exploitation feeds — treat this as unknown, not clear."
+          exit 1
+        fi
+
+        running=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['counts']['clock_running'])" "$json_path")
+        urgent=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['counts']['urgent_review'])" "$json_path")
+        echo "clock-running=$running" >> "$GITHUB_OUTPUT"
+        echo "urgent=$urgent" >> "$GITHUB_OUTPUT"
+
+        # Human-readable run, rendered into the job summary.
+        redhand "${{ inputs.sbom }}" --quiet --fail-on never > "$RUNNER_TEMP/redhand.txt" 2>/dev/null
+
+        {
+          echo "## redhand — CRA Article 14 exposure"
+          echo
+          if [ "$running" -gt 0 ]; then
+            echo "> [!CAUTION]"
+            echo "> **$running vulnerabilities confirmed exploited in the wild.**"
+            echo "> If these ship in a product placed on the EU market, assess"
+            echo "> Article 14 reporting now — the early warning window is 24 hours."
+          elif [ "$urgent" -gt 0 ]; then
+            echo "> [!WARNING]"
+            echo "> **$urgent with elevated exploitation probability.** Not yet"
+            echo "> confirmed exploited, but these become obligations first."
+          else
+            echo "> [!NOTE]"
+            echo "> No exploitation signal at this moment. A point-in-time"
+            echo "> observation about known feeds, not a determination that no"
+            echo "> reporting obligation exists."
+          fi
+          echo
+          echo '```'
+          cat "$RUNNER_TEMP/redhand.txt"
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        case "${{ inputs.fail-on }}" in
+          never)     exit 0 ;;
+          urgent)    if [ "$running" -gt 0 ] || [ "$urgent" -gt 0 ]; then exit 1; fi ;;
+          *)         if [ "$running" -gt 0 ]; then exit 1; fi ;;
+        esac
+        exit 0

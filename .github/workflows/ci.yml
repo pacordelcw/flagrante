@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # The feeds are external and can change shape without warning. A daily run
+    # means we find out from CI rather than from a user with a live obligation.
+    - cron: "17 6 * * *"
+
+jobs:
+  tests:
+    name: Unit tests (${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run the suite
+        # No dependencies to install; that is the point.
+        run: python -m unittest discover -s tests -v
+
+  feeds:
+    name: Live feed contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Scan the sample against real feeds
+        run: |
+          python -m redhand.cli samples/sample-cyclonedx.json --json > result.json
+          python - <<'PY'
+          import json, sys
+          r = json.load(open("result.json"))
+          counts = r["counts"]
+          print(json.dumps(counts, indent=2))
+
+          # Log4Shell has been in CISA KEV since 2021 and is not coming out.
+          # If this stops firing, our join broke -- and a silent false negative
+          # is the one failure mode this tool must never have.
+          assert counts["clock_running"] >= 1, "expected a KEV hit for log4j 2.14.1"
+          cves = {f["cve"] for f in r["findings"]}
+          assert "CVE-2021-44228" in cves, f"Log4Shell missing from {sorted(cves)}"
+
+          # And the wording must still refuse to reassure.
+          for phrase in ("you are compliant", "no action needed", "not required to report"):
+              assert phrase not in r["verdict"].lower(), f"verdict softened: {phrase}"
+          print("feed contract holds")
+          PY
+
+  action:
+    name: GitHub Action self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the action against the sample
+        id: scan
+        uses: ./
+        with:
+          sbom: samples/sample-cyclonedx.json
+          # The sample deliberately contains Log4Shell, so a normal run would
+          # fail the job by design. Here we only want to prove the action works.
+          fail-on: never
+      - name: Check the action reported findings
+        run: |
+          echo "clock-running=${{ steps.scan.outputs.clock-running }}"
+          echo "urgent=${{ steps.scan.outputs.urgent }}"
+          test "${{ steps.scan.outputs.clock-running }}" -ge 1 \
+            || { echo "action produced no confirmed-exploited count"; exit 1; }

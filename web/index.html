@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redhand — which components start your CRA 24-hour clock</title>
+<meta name="description" content="Thousands of your dependencies are vulnerable. A few dozen are being exploited. Only those start a Cyber Resilience Act Article 14 reporting clock. Redhand tells you which.">
+<meta property="og:title" content="Redhand — caught in the act, not merely vulnerable">
+<meta property="og:description" content="Article 14 gives you 24 hours from awareness of an actively exploited vulnerability. Every other scanner shows you vulnerabilities. Redhand shows you exploitation.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#FBFAF9; --panel:#FFFFFF; --sunk:#F1EFED;
+  --ink:#16130F; --muted:#5E574F; --faint:#8D857B;
+  --rule:#DFDAD4; --rule-firm:#C2BAB1;
+  --caught:#B32D22; --caught-wash:#FBEAE7;
+  --elevated:#8A5B00; --elevated-wash:#FAF0DC;
+  --steady:#3F6B57;
+  --term-bg:#1B1917; --term-ink:#EDE7DF;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#131210; --panel:#1B1917; --sunk:#221F1C;
+    --ink:#F0EBE4; --muted:#A79E93; --faint:#7A7269;
+    --rule:#2C2825; --rule-firm:#413B36;
+    --caught:#FF7A67; --caught-wash:#2E1A16;
+    --elevated:#E5A83C; --elevated-wash:#2A2113;
+    --steady:#67B394;
+    --term-bg:#0C0B0A; --term-ink:#EDE7DF;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131210; --panel:#1B1917; --sunk:#221F1C;
+  --ink:#F0EBE4; --muted:#A79E93; --faint:#7A7269;
+  --rule:#2C2825; --rule-firm:#413B36;
+  --caught:#FF7A67; --caught-wash:#2E1A16;
+  --elevated:#E5A83C; --elevated-wash:#2A2113;
+  --steady:#67B394;
+  --term-bg:#0C0B0A; --term-ink:#EDE7DF;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:Chivo,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace}
+a{color:var(--caught)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--steady);outline-offset:2px}
+
+/* ---- masthead ---- */
+header.top{display:flex;align-items:center;justify-content:space-between;
+  padding:22px 0;border-bottom:1px solid var(--rule);gap:20px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--caught)}
+.top nav{display:flex;gap:20px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.03em}
+.top nav a{color:var(--muted);text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+
+/* ---- hero ---- */
+.hero{padding:64px 0 24px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--caught);margin:0 0 20px;display:flex;gap:10px;flex-wrap:wrap}
+.eyebrow em{font-style:normal;color:var(--faint)}
+h1{font-size:clamp(34px,5.6vw,54px);font-weight:800;letter-spacing:-.03em;line-height:1.06;
+  margin:0 0 22px;max-width:19ch;text-wrap:balance}
+h1 .hit{color:var(--caught)}
+.lede{font-size:19px;line-height:1.55;color:var(--muted);max-width:58ch;margin:0 0 30px}
+.lede strong{color:var(--ink);font-weight:600}
+
+.install{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.install code{background:var(--panel);border:1px solid var(--rule-firm);
+  padding:11px 15px;font-size:13.5px;display:inline-block}
+.install .arrow{color:var(--faint);font-family:"JetBrains Mono",monospace;font-size:13px}
+.install-note{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);margin:0}
+
+/* ---- terminal ---- */
+.term{background:var(--term-bg);border:1px solid var(--rule-firm);margin:38px 0 0;
+  overflow-x:auto;padding:20px 22px}
+.term pre{margin:0;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.75;
+  color:var(--term-ink);white-space:pre}
+.term .r{color:#FF7A67;font-weight:600}
+.term .y{color:#E5A83C;font-weight:600}
+.term .d{color:#7A7269}
+.term .g{color:#67B394}
+
+/* ---- sections ---- */
+section{padding:62px 0}
+section + section{border-top:1px solid var(--rule)}
+h2{font-size:27px;font-weight:800;letter-spacing:-.022em;margin:0 0 10px;line-height:1.2;text-wrap:balance}
+.sub{color:var(--muted);max-width:62ch;margin:0 0 26px;font-size:16.5px}
+h3{font-size:16px;font-weight:600;margin:0 0 6px}
+
+/* Three cells, so auto-fit is wrong: at middling widths it yields two columns
+   and strands the third alone beside a slab of dead background. Three-up or
+   one-up, never two-plus-one. */
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--rule);border:1px solid var(--rule)}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+.cell{background:var(--panel);padding:20px}
+.cell .src{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--faint);display:block;margin-bottom:9px}
+.cell p{margin:0;font-size:14.5px;color:var(--muted);line-height:1.55}
+
+table.tiers{width:100%;border-collapse:collapse;border:1px solid var(--rule);background:var(--panel)}
+table.tiers th,table.tiers td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--rule);
+  font-size:14.5px;vertical-align:top}
+table.tiers th{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);font-weight:600;background:var(--sunk)}
+table.tiers tr:last-child td{border-bottom:none}
+table.tiers td:first-child{font-weight:600;white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:9px;vertical-align:1px}
+.dot.c{background:var(--caught)} .dot.e{background:var(--elevated)}
+.dot.m{background:var(--rule-firm)} .dot.u{background:var(--faint)}
+
+/* ---- hosted scan ---- */
+.drop{border:2px dashed var(--rule-firm);background:var(--panel);padding:38px 28px;
+  text-align:center;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--caught);background:var(--caught-wash)}
+.drop.busy{opacity:.6;pointer-events:none}
+.drop h3{font-size:19px;font-weight:700;margin:0 0 8px;letter-spacing:-.015em}
+.drop p{margin:0 0 18px;color:var(--muted);font-size:14.5px}
+.drop input[type=file]{display:none}
+.drop label.pick{display:inline-block;padding:11px 22px;background:var(--caught);color:#fff;
+  font-weight:600;font-size:15px;cursor:pointer;border:1px solid var(--caught)}
+.drop label.pick:hover{filter:brightness(1.08)}
+.drop .hint{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);
+  margin:16px 0 0;line-height:1.7}
+
+.promise{display:flex;gap:12px;align-items:flex-start;background:var(--sunk);
+  border-left:3px solid var(--steady);padding:16px 18px;margin:18px 0 0}
+.promise .k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--steady);white-space:nowrap;padding-top:2px;font-weight:600}
+.promise p{margin:0;font-size:14px;color:var(--muted);line-height:1.55}
+
+.scanning{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);
+  padding:22px;text-align:center;border:1px solid var(--rule);background:var(--panel)}
+
+.outcome{border:1px solid var(--rule-firm);border-top:4px solid var(--rule-firm);
+  background:var(--panel);padding:26px}
+.outcome.caught{border-top-color:var(--caught);background:var(--caught-wash)}
+.outcome.elevated{border-top-color:var(--elevated);background:var(--elevated-wash)}
+.outcome .lab{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.outcome.caught .lab{color:var(--caught)}
+.outcome.elevated .lab{color:var(--elevated)}
+.outcome .say{font-size:17px;line-height:1.5;margin:0 0 22px;max-width:60ch}
+.tally{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:0 0 22px}
+@media (max-width:620px){.tally{grid-template-columns:repeat(2,1fr)}}
+.tally div{background:var(--panel);padding:14px 15px}
+.tally .n{font-size:26px;font-weight:800;line-height:1;display:block;margin-bottom:5px;
+  font-variant-numeric:tabular-nums}
+.tally .k{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--faint);display:block;line-height:1.4}
+.tally .n.c{color:var(--caught)} .tally .n.e{color:var(--elevated)}
+.hits{display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin:0 0 22px;max-height:340px;overflow-y:auto}
+.hit{background:var(--panel);padding:13px 16px}
+.hit .id{font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:600;margin-right:10px}
+.hit .id.c{color:var(--caught)} .hit .id.e{color:var(--elevated)}
+.hit .cp{font-family:"JetBrains Mono",monospace;font-size:12.5px;word-break:break-all}
+.hit .rz{display:block;font-size:13px;color:var(--muted);margin-top:5px;line-height:1.5}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.acts a,.acts button{padding:10px 18px;font-family:Chivo,sans-serif;font-size:14.5px;
+  font-weight:600;border:1px solid var(--rule-firm);background:var(--panel);color:var(--ink);
+  text-decoration:none;cursor:pointer;display:inline-block}
+.acts .primary{background:var(--caught);border-color:var(--caught);color:#fff}
+
+.survey{border:1px solid var(--rule);background:var(--sunk);padding:22px;margin:22px 0 0}
+.survey h4{margin:0 0 6px;font-size:15px;font-weight:700}
+.survey p.q{margin:0 0 16px;font-size:13.5px;color:var(--faint)}
+.survey label{display:block;font-size:13.5px;color:var(--muted);margin:0 0 6px}
+.survey input,.survey select{width:100%;padding:10px 12px;margin:0 0 14px;
+  font-family:"JetBrains Mono",monospace;font-size:13px;border:1px solid var(--rule-firm);
+  background:var(--ground);color:var(--ink)}
+.survey button{padding:10px 20px;font-family:Chivo,sans-serif;font-size:14px;font-weight:600;
+  border:1px solid var(--rule-firm);background:var(--panel);color:var(--ink);cursor:pointer}
+.err-box{border:1px solid var(--caught);background:var(--caught-wash);padding:18px 20px;
+  font-size:14.5px;color:var(--ink)}
+.err-box strong{display:block;margin-bottom:5px}
+
+/* ---- waitlist ---- */
+.waitlist{border:1px solid var(--rule-firm);border-top:4px solid var(--caught);
+  background:var(--panel);padding:34px}
+.price{display:flex;align-items:baseline;gap:12px;margin:0 0 6px;flex-wrap:wrap}
+.price .n{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.price .u{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--faint)}
+.price-note{font-size:14px;color:var(--faint);margin:0 0 24px}
+form.signup{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+form.signup input{flex:1 1 260px;padding:12px 14px;font-family:"JetBrains Mono",monospace;
+  font-size:14px;border:1px solid var(--rule-firm);background:var(--ground);color:var(--ink)}
+form.signup button{padding:12px 22px;font-family:Chivo,sans-serif;font-size:15px;font-weight:600;
+  border:1px solid var(--caught);background:var(--caught);color:#fff;cursor:pointer}
+form.signup button:hover{filter:brightness(1.08)}
+.form-msg{font-family:"JetBrains Mono",monospace;font-size:12.5px;margin:0;min-height:1.5em}
+.form-msg.ok{color:var(--steady)} .form-msg.err{color:var(--caught)}
+.small{font-size:13px;color:var(--faint);margin:14px 0 0;max-width:56ch}
+
+/* ---- limits ---- */
+.limits ol{margin:0;padding-left:22px;max-width:64ch}
+.limits li{margin-bottom:14px;color:var(--muted);line-height:1.6}
+.limits li strong{color:var(--ink);font-weight:600}
+
+footer.end{border-top:1px solid var(--rule);padding:30px 0 60px;
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);line-height:1.8}
+footer.end a{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="top">
+  <a class="brand" href="/">Red<span>hand</span></a>
+  <nav>
+    <a href="#how">How it decides</a>
+    <a href="#limits">Limits</a>
+    <a href="https://github.com/pacordelcw/redhand">GitHub</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <p class="eyebrow">CRA Article 14 <em>—</em> reporting live since 11 September 2026</p>
+  <h1>Vulnerable is not the same as <span class="hit">exploited</span>.</h1>
+  <p class="lede">
+    Your SBOM has hundreds of components carrying thousands of known CVEs. A few dozen
+    of those CVEs are actually being exploited in the wild right now. <strong>Only that
+    second group starts a 24-hour reporting clock.</strong> Every other scanner shows you
+    the first. Redhand shows you the difference.
+  </p>
+  <div class="install">
+    <code>pip install redhand</code>
+    <span class="arrow">then</span>
+    <code>syft dir:. -o cyclonedx-json | redhand</code>
+  </div>
+  <p class="install-note">Free. No account. No dependencies. Works offline against cached feeds.</p>
+</div>
+
+<div class="term">
+<pre><span class="d">$ syft dir:. -o cyclonedx-json | redhand</span>
+
+<span class="r">24-HOUR CLOCK LIKELY RUNNING  (2)</span>
+<span class="d">  Confirmed exploited in the wild -- CISA KEV</span>
+
+  <span class="r">CVE-2021-44228</span>  org.apache.logging.log4j/log4j-core@2.14.1
+      <span class="d">listed in CISA KEV since 2021-12-10 as exploited in the wild,
+      linked to ransomware campaigns</span>
+
+<span class="y">ASSESS TODAY  (16)</span>
+<span class="d">  Elevated exploitation probability, not yet confirmed</span>
+
+  <span class="y">CVE-2019-12384</span>  com.fasterxml.jackson.core/jackson-databind@2.9.8
+      <span class="d">EPSS 45% probability of exploitation within 30 days</span>
+
+<span class="d">  65 further known vulnerabilities with no exploitation signal (--all to list)</span>
+
+<span class="d">CANNOT BE CHECKED  (2)
+  No package URL in the SBOM. An unknown, not a clear.</span>
+
+VERDICT
+  1 component carries 2 vulnerabilities confirmed exploited in the
+  wild. If any of these ship in a product you place on the EU market,
+  assess Article 14 reporting now.
+
+ARTICLE 14 CASCADE
+  Early warning     <span class="g">2026-09-04 17:10 UTC</span>   (24h)
+  Notification      2026-09-06 17:10 UTC   (72h)
+  Final report      2026-09-17 17:10 UTC   (14d)</pre>
+</div>
+
+<section id="scan">
+  <h2>Check yours now</h2>
+  <p class="sub">
+    Drop in a CycloneDX or SPDX JSON SBOM. No account, no email, nothing to install.
+  </p>
+
+  <div class="drop" id="drop">
+    <h3>Drop an SBOM here</h3>
+    <p>CycloneDX or SPDX, JSON, up to 5&nbsp;MB and 1,000 components.</p>
+    <input type="file" id="file" accept=".json,application/json">
+    <label class="pick" for="file">Choose a file</label>
+    <p class="hint">
+      Don't have one? &nbsp;<code>syft dir:. -o cyclonedx-json &gt; sbom.json</code>
+    </p>
+  </div>
+
+  <div class="promise">
+    <span class="k">Your SBOM</span>
+    <p>
+      An SBOM is a complete inventory of your software supply chain, so the only
+      honest thing to do with it is nothing. It is parsed in memory, scanned, and
+      dropped when the request ends. It is never written to disk, never logged,
+      and never stored &mdash; there is no storage layer in the scanner to leak.
+      If you would rather it never left your machine at all, that is what the CLI
+      is for, and it does exactly the same thing.
+    </p>
+  </div>
+
+  <div id="scan-out" style="margin-top:26px"></div>
+</section>
+
+<section id="how">
+  <h2>How it decides</h2>
+  <p class="sub">
+    Three public feeds, no API keys, no account. Redhand does not generate your
+    SBOM — syft and cdxgen already do that well and for free. It answers the one
+    question they do not.
+  </p>
+
+  <div class="split">
+    <div class="cell">
+      <span class="src">OSV.dev</span>
+      <h3>Which components are vulnerable</h3>
+      <p>Every component with a package URL is checked against the open vulnerability database.</p>
+    </div>
+    <div class="cell">
+      <span class="src">CISA KEV</span>
+      <h3>Which CVEs are exploited</h3>
+      <p>The Known Exploited Vulnerabilities catalogue: observed being used against real targets.</p>
+    </div>
+    <div class="cell">
+      <span class="src">FIRST EPSS</span>
+      <h3>Which are about to be</h3>
+      <p>Modelled probability of exploitation within 30 days, for everything KEV has not caught yet.</p>
+    </div>
+  </div>
+
+  <p class="sub" style="margin-top:30px">Which lands each finding in one of four tiers:</p>
+
+  <table class="tiers">
+    <thead><tr><th>Tier</th><th>Trigger</th><th>What it means for you</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="dot c"></span>Clock running</td>
+        <td>Listed in CISA KEV</td>
+        <td>Assess Article 14 reporting now. The 24-hour window runs from awareness.</td>
+      </tr>
+      <tr>
+        <td><span class="dot e"></span>Assess today</td>
+        <td>EPSS ≥ 10%, not in KEV</td>
+        <td>Not confirmed exploited. This is the group that becomes an obligation next.</td>
+      </tr>
+      <tr>
+        <td><span class="dot m"></span>Track</td>
+        <td>Known CVE, no exploit signal</td>
+        <td>Patch on your normal cadence.</td>
+      </tr>
+      <tr>
+        <td><span class="dot u"></span>Cannot be checked</td>
+        <td>No package URL in the SBOM</td>
+        <td>An unknown, not a clear. Usually a vendored binary or first-party module.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>A scan is a snapshot. The obligation is continuous.</h2>
+  <p class="sub">
+    KEV grows every week, and the 24-hour window starts when you become aware —
+    not when you next remember to run a scan. The technical file behind an
+    Article 14 report also has to show <em>when</em> you knew, and holding that
+    evidence for ten years is part of the obligation, not a nice-to-have.
+  </p>
+
+  <div class="waitlist">
+    <div class="price">
+      <span class="n">€490</span>
+      <span class="u">per product line / month</span>
+    </div>
+    <p class="price-note">Planned pricing. Continuous watching, alerts the hour KEV changes, and a dated evidence trail you can hand to a market surveillance authority.</p>
+
+    <form class="signup" id="waitlist-form">
+      <input type="email" name="email" placeholder="you@manufacturer.eu" required aria-label="Email address">
+      <button type="submit">Join the waitlist</button>
+    </form>
+    <p class="form-msg" id="form-msg" role="status"></p>
+    <p class="small">
+      No charge now and no card. We will write once when it is ready, and once more
+      if the price changes before launch. Nothing else.
+    </p>
+  </div>
+</section>
+
+<section id="limits" class="limits">
+  <h2>What Redhand is not</h2>
+  <p class="sub">
+    A tool in this space that hides its limits is not worth trusting with a
+    €15 million reporting obligation. Three, stated plainly:
+  </p>
+  <ol>
+    <li><strong>It cannot tell whether the vulnerable code is reachable in your product.</strong>
+      A KEV listing means the CVE is exploited somewhere in the world, not that your
+      build is under attack. Article 14 turns on the vulnerability being in the product
+      <em>and</em> actively exploited. That second judgement is yours and always will be.</li>
+    <li><strong>"Actively exploited" is not perfectly determinable from public data.</strong>
+      KEV lags real exploitation, and EPSS is a model rather than an observation.
+      Absence of a signal here is not evidence of absence in the world.</li>
+    <li><strong>There is deliberately no outcome that means you are compliant.</strong>
+      Over-flagging costs you an afternoon. Under-flagging costs up to €15 million or
+      2.5% of global turnover. Every threshold is set by that asymmetry, and the test
+      suite fails the build if a future change ever softens the wording into reassurance.</li>
+  </ol>
+  <p class="small" style="margin-top:22px">
+    If a feed is unreachable, Redhand refuses to print a result rather than printing an
+    empty one. An unreachable exploitation feed and a clean scan look identical and mean
+    opposite things.
+  </p>
+</section>
+
+<footer class="end">
+  Redhand — caught in the act, not merely vulnerable.<br>
+  Built on <a href="https://osv.dev">OSV</a>,
+  <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">CISA KEV</a> and
+  <a href="https://www.first.org/epss/">FIRST EPSS</a>. Apache-2.0.<br>
+  Exposure indicator only. Not a conformity assessment, not legal advice, and not a
+  determination that no reporting obligation exists.
+</footer>
+
+</div>
+
+<script>
+/* ---- hosted scan ------------------------------------------------------- */
+(function () {
+  // Overridden at deploy time; falls back to the local server during dev.
+  var SCANNER = window.REDHAND_SCANNER ||
+    (location.hostname === 'redhand.dev' || location.hostname === 'www.redhand.dev'
+      ? 'https://scan.redhand.dev'
+      : 'http://127.0.0.1:8904');
+
+  var drop = document.getElementById('drop');
+  var input = document.getElementById('file');
+  var out = document.getElementById('scan-out');
+  if (!drop || !input || !out) return;
+
+  var lastHtml = null;
+  var lastResult = null;
+
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function fail(title, detail) {
+    out.innerHTML =
+      '<div class="err-box"><strong>' + esc(title) + '</strong>' + esc(detail) + '</div>';
+  }
+
+  function tally(counts) {
+    return '<div class="tally">' +
+      '<div><span class="n c">' + counts.clock_running + '</span>' +
+      '<span class="k">Confirmed exploited</span></div>' +
+      '<div><span class="n e">' + counts.urgent_review + '</span>' +
+      '<span class="k">Elevated probability</span></div>' +
+      '<div><span class="n">' + counts.monitor + '</span>' +
+      '<span class="k">No exploit signal</span></div>' +
+      '<div><span class="n">' + counts.unresolvable + '</span>' +
+      '<span class="k">Could not be checked</span></div>' +
+      '</div>';
+  }
+
+  function hits(findings) {
+    if (!findings.length) return '';
+    return '<div class="hits">' + findings.map(function (f) {
+      var cls = f.tier === 'clock_running' ? 'c' : 'e';
+      return '<div class="hit"><span class="id ' + cls + '">' + esc(f.cve) + '</span>' +
+        '<span class="cp">' + esc(f.component) + '</span>' +
+        '<span class="rz">' + esc(f.reason) + '</span></div>';
+    }).join('') + '</div>';
+  }
+
+  function survey() {
+    return '<div class="survey" id="survey">' +
+      '<h4>Two optional questions</h4>' +
+      '<p class="q">They tell us who this is actually for. No email, nothing identifying, ' +
+      'and skipping them changes nothing about your result.</p>' +
+      '<label for="s-makes">What do you make?</label>' +
+      '<input id="s-makes" maxlength="120" placeholder="industrial controllers, a SaaS platform, medical devices...">' +
+      '<label for="s-doing">What are you doing today about Article 14 reporting?</label>' +
+      '<select id="s-doing">' +
+      '<option value="">Choose one</option>' +
+      '<option>Nothing yet</option>' +
+      '<option>Working out whether it applies to us</option>' +
+      '<option>A manual process someone owns</option>' +
+      '<option>Automated in our pipeline</option>' +
+      '<option>An external consultant handles it</option>' +
+      '</select>' +
+      '<button type="button" id="s-send">Send</button>' +
+      '<span id="s-msg" class="q" style="margin-left:12px"></span>' +
+      '</div>';
+  }
+
+  function render(result, html) {
+    lastHtml = html;
+    lastResult = result;
+    var c = result.counts;
+    var tone = c.clock_running ? 'caught' : (c.urgent_review ? 'elevated' : '');
+    var lab = c.clock_running ? 'Caught in the act'
+      : (c.urgent_review ? 'Not yet confirmed' : 'Point-in-time observation');
+
+    out.innerHTML =
+      '<div class="outcome ' + tone + '">' +
+      '<p class="lab">' + esc(lab) + '</p>' +
+      '<p class="say">' + esc(result.verdict) + '</p>' +
+      tally(c) +
+      hits(result.findings) +
+      '<div class="acts">' +
+      '<button type="button" class="primary" id="dl">Download the full report</button>' +
+      '<a href="#waitlist-form">Watch this continuously</a>' +
+      '</div>' +
+      survey() +
+      '</div>';
+
+    document.getElementById('dl').addEventListener('click', function () {
+      var blob = new Blob([lastHtml], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'redhand-' + (result.subject || 'sbom').replace(/[^a-z0-9._-]/gi, '-') + '.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    });
+
+    document.getElementById('s-send').addEventListener('click', function () {
+      var msg = document.getElementById('s-msg');
+      var makes = document.getElementById('s-makes').value.trim();
+      var doing = document.getElementById('s-doing').value;
+      if (!makes && !doing) { msg.textContent = 'Nothing to send.'; return; }
+      msg.textContent = 'Sending...';
+      fetch('/api/signal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          makes: makes.slice(0, 120),
+          doing: doing,
+          // Counts only. The component list never leaves the scanner.
+          counts: lastResult.counts,
+          components_checked: lastResult.components_checked,
+          sbom_format: lastResult.sbom_format
+        })
+      })
+        .then(function (r) { if (!r.ok) throw new Error(); msg.textContent = 'Thank you.'; })
+        .catch(function () { msg.textContent = 'Did not send, no matter.'; });
+    });
+  }
+
+  function send(file) {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      fail('That SBOM is over 5 MB. ',
+        'The hosted scanner caps there. Run it locally instead, unmetered: pip install redhand');
+      return;
+    }
+
+    drop.classList.add('busy');
+    out.innerHTML = '<div class="scanning">Scanning ' + esc(file.name) +
+      ' against OSV, CISA KEV and EPSS. Large dependency trees can take a minute.</div>';
+
+    file.text().then(function (text) {
+      return fetch(SCANNER + '/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: text
+      });
+    }).then(function (response) {
+      return response.json().then(function (body) {
+        if (!response.ok) throw new Error(body.error || ('HTTP ' + response.status));
+        return body;
+      });
+    }).then(function (body) {
+      render(body.result, body.html);
+    }).catch(function (error) {
+      fail('That did not work. ', error.message || 'The scanner could not be reached.');
+    }).finally(function () {
+      drop.classList.remove('busy');
+    });
+  }
+
+  input.addEventListener('change', function () { send(input.files[0]); });
+
+  ['dragenter', 'dragover'].forEach(function (name) {
+    drop.addEventListener(name, function (event) {
+      event.preventDefault();
+      drop.classList.add('over');
+    });
+  });
+  ['dragleave', 'drop'].forEach(function (name) {
+    drop.addEventListener(name, function (event) {
+      event.preventDefault();
+      drop.classList.remove('over');
+    });
+  });
+  drop.addEventListener('drop', function (event) {
+    if (event.dataTransfer && event.dataTransfer.files.length) {
+      send(event.dataTransfer.files[0]);
+    }
+  });
+})();
+
+/* ---- waitlist ---------------------------------------------------------- */
+(function () {
+  var form = document.getElementById('waitlist-form');
+  var msg = document.getElementById('form-msg');
+  if (!form) return;
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var button = form.querySelector('button');
+    var email = form.querySelector('input[name=email]').value.trim();
+    if (!email) return;
+
+    button.disabled = true;
+    msg.className = 'form-msg';
+    msg.textContent = 'Adding you...';
+
+    fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, price_shown: 490, currency: 'EUR' })
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+      })
+      .then(function () {
+        msg.className = 'form-msg ok';
+        msg.textContent = 'You are on the list. We will not email you about anything else.';
+        form.reset();
+      })
+      .catch(function () {
+        msg.className = 'form-msg err';
+        msg.textContent = 'That did not go through. Try again, or mail hello@redhand.dev.';
+      })
+      .finally(function () {
+        button.disabled = false;
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
