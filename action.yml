@@ -1,8 +1,8 @@
-name: "flagrante — CRA Article 14 exposure check"
+name: "Flagrante CRA Article 14 Check"
 description: >-
   Check an SBOM for components carrying vulnerabilities confirmed exploited in
   the wild — the ones that start a Cyber Resilience Act 24-hour reporting clock.
-author: "flagrante"
+author: "Flagrante"
 
 branding:
   icon: "clock"

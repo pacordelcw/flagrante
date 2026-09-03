@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flagrante"
-version = "0.0.1"
+version = "0.0.2"
 description = "Which of your components carry vulnerabilities confirmed exploited in the wild -- the ones that start a CRA Article 14 24-hour reporting clock"
 readme = "README.md"
 requires-python = ">=3.10"
