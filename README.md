@@ -62,7 +62,7 @@ Exit codes: `0` nothing at the chosen level, `1` confirmed exploited,
 ```yaml
 - uses: actions/checkout@v4
 - run: syft dir:. -o cyclonedx-json > sbom.json
-- uses: pacordelcw/flagrante@v1
+- uses: pacordelcw/flagrante@v0.0.1
   with:
     sbom: sbom.json
     fail-on: exploited
