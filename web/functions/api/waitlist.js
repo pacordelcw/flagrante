@@ -49,6 +49,16 @@ export async function onRequestPost({ request, env }) {
     : null;
   const currency = String(payload?.currency ?? "EUR").slice(0, 3).toUpperCase();
 
+  // Which arm of the price test they were in, and which browser they came
+  // from. Together these let the waitlist be read as elasticity rather than a
+  // single undifferentiated count.
+  const bucket = ["a", "b"].includes(payload?.price_bucket)
+    ? payload.price_bucket
+    : null;
+  const visitorId = /^[a-z0-9]{16,40}$/.test(String(payload?.visitor_id ?? ""))
+    ? payload.visitor_id
+    : null;
+
   // Country and referrer tell us which channel produced the intent, which is
   // the thing we actually need to read off this experiment.
   const country = request.headers.get("CF-IPCountry") ?? null;
@@ -56,13 +66,24 @@ export async function onRequestPost({ request, env }) {
 
   try {
     await env.DB.prepare(
-      `INSERT INTO waitlist (email, price_shown, currency, country, referer, created_at)
-       VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+      `INSERT INTO waitlist
+         (email, price_shown, currency, country, referer, created_at,
+          price_bucket, visitor_id)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
        ON CONFLICT(email) DO UPDATE SET
          price_shown = excluded.price_shown,
          seen_again_at = excluded.created_at`
     )
-      .bind(email, priceShown, currency, country, referer, new Date().toISOString())
+      .bind(
+        email,
+        priceShown,
+        currency,
+        country,
+        referer,
+        new Date().toISOString(),
+        bucket,
+        visitorId
+      )
       .run();
   } catch (error) {
     // Never surface the database error to the caller, but do not pretend it

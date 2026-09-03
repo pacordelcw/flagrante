@@ -370,8 +370,8 @@ ARTICLE 14 CASCADE
 
   <div class="waitlist">
     <div class="price">
-      <span class="n">€490</span>
-      <span class="u">per product line / month</span>
+      <span class="n" id="price-amount">€490</span>
+      <span class="u" id="price-unit">per product line / month</span>
     </div>
     <p class="price-note">Planned pricing. Continuous watching, alerts the hour KEV changes, and a dated evidence trail you can hand to a market surveillance authority.</p>
 
@@ -419,12 +419,98 @@ ARTICLE 14 CASCADE
   <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">CISA KEV</a> and
   <a href="https://www.first.org/epss/">FIRST EPSS</a>. Apache-2.0.<br>
   Exposure indicator only. Not a conformity assessment, not legal advice, and not a
-  determination that no reporting obligation exists.
+  determination that no reporting obligation exists.<br>
+  This page keeps one random number in your browser so we can tell a returning
+  visitor from a new one. No cookies, no account, no email, no IP address, and
+  nothing that identifies you. Clearing your site data erases it completely.
 </footer>
 
 </div>
 
 <script>
+/* ---- visitor identity, return tracking, price test ---------------------
+   Gate 2 turns on a 30-day return rate, so the page has to recognise a
+   returning browser. It does that with a random id in that browser's own
+   localStorage -- no cookie, no account, no IP kept, nothing identifying.
+   Someone who returns on another machine or clears storage counts as new,
+   so the measured rate is a floor, never an inflated ceiling.            */
+window.REDHAND = (function () {
+  var ID_KEY = 'redhand.vid';
+  var BUCKET_KEY = 'redhand.bucket';
+
+  // Two prices, assigned once and then held for the life of that browser.
+  // Showing a returning visitor a different number than last time would be
+  // both dishonest and useless as a measurement.
+  var PRICES = {
+    a: { amount: '€149', unit: 'per product line / month', value: 149 },
+    b: { amount: '€490', unit: 'per product line / month', value: 490 }
+  };
+
+  function store(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* private window */ }
+  }
+  function load(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function newId() {
+    try {
+      var bytes = new Uint8Array(12);
+      crypto.getRandomValues(bytes);
+      return Array.prototype.map
+        .call(bytes, function (b) { return ('0' + b.toString(16)).slice(-2); })
+        .join('');
+    } catch (e) {
+      return (Date.now().toString(36) + Math.random().toString(36).slice(2, 14))
+        .replace(/[^a-z0-9]/g, '').slice(0, 24);
+    }
+  }
+
+  var id = load(ID_KEY);
+  var isNew = !id;
+  if (isNew) { id = newId(); store(ID_KEY, id); }
+
+  var bucket = load(BUCKET_KEY);
+  if (bucket !== 'a' && bucket !== 'b') {
+    bucket = Math.random() < 0.5 ? 'a' : 'b';
+    store(BUCKET_KEY, bucket);
+  }
+
+  function ping(event) {
+    // keepalive so a ping fired as the page unloads still lands.
+    try {
+      fetch('/api/visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, event: event, price_bucket: bucket }),
+        keepalive: true
+      }).catch(function () {});
+    } catch (e) { /* tracking must never break the page */ }
+  }
+
+  function paintPrice() {
+    var price = PRICES[bucket];
+    var amount = document.getElementById('price-amount');
+    var unit = document.getElementById('price-unit');
+    if (amount) amount.textContent = price.amount;
+    if (unit) unit.textContent = price.unit;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', paintPrice);
+  } else {
+    paintPrice();
+  }
+  ping('visit');
+
+  return {
+    id: id,
+    bucket: bucket,
+    price: function () { return PRICES[bucket]; },
+    ping: ping
+  };
+})();
+
 /* ---- hosted scan ------------------------------------------------------- */
 (function () {
   // Overridden at deploy time; falls back to the local server during dev.
@@ -576,6 +662,9 @@ ARTICLE 14 CASCADE
         return body;
       });
     }).then(function (body) {
+      // A completed scan is a qualified activation: the denominator of the
+      // return rate. Mere page views do not count.
+      if (window.REDHAND) window.REDHAND.ping('scan');
       render(body.result, body.html);
     }).catch(function (error) {
       fail('That did not work. ', error.message || 'The scanner could not be reached.');
@@ -624,7 +713,13 @@ ARTICLE 14 CASCADE
     fetch('/api/waitlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, price_shown: 490, currency: 'EUR' })
+      body: JSON.stringify({
+        email: email,
+        price_shown: window.REDHAND ? window.REDHAND.price().value : null,
+        price_bucket: window.REDHAND ? window.REDHAND.bucket : null,
+        visitor_id: window.REDHAND ? window.REDHAND.id : null,
+        currency: 'EUR'
+      })
     })
       .then(function (response) {
         if (!response.ok) throw new Error('HTTP ' + response.status);
