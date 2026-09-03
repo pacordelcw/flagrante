@@ -12,6 +12,12 @@ main = "worker/index.js"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
 
+# One public name for the scanner, not two. The workers.dev hostname would be a
+# second door to the same code with the same limits -- no extra risk, but no
+# reason to maintain either.
+workers_dev = false
+preview_urls = false
+
 [observability]
 enabled = true
 
