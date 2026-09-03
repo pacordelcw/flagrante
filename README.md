@@ -10,7 +10,7 @@ Every SBOM scanner on the market tells you which components are *vulnerable*.
 That is not the question Article 14 asks. Thousands of CVEs are vulnerabilities;
 a few hundred are being exploited. Only the second group starts a clock.
 
-`flagrante` makes that distinction the whole output.
+Flagrante makes that distinction the whole output.
 
 ```
 24-HOUR CLOCK LIKELY RUNNING  (2)
