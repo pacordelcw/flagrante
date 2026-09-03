@@ -1,7 +1,9 @@
 name: "Flagrante CRA Article 14 Check"
-description: >-
-  Check an SBOM for components carrying vulnerabilities confirmed exploited in
-  the wild — the ones that start a Cyber Resilience Act 24-hour reporting clock.
+# The GitHub Marketplace caps this at 125 characters, and it is the one line
+# people read on the listing card. It keeps the distinction the product exists
+# to draw, and a plain hyphen rather than an em-dash so nothing transliterates
+# unpredictably.
+description: "Which SBOM components carry vulnerabilities confirmed exploited in the wild - the ones that start a CRA 24-hour clock."
 author: "Flagrante"
 
 branding:
