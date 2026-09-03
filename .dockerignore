@@ -1,0 +1,17 @@
+# The build context is the repo root, so everything the image does not COPY is
+# pure upload cost. node_modules alone is ~190 MB of it.
+node_modules
+web/
+worker/
+tests/
+samples/
+.git
+.github
+.wrangler
+**/__pycache__
+**/*.pyc
+package.json
+package-lock.json
+wrangler.toml
+*.md
+LICENSE

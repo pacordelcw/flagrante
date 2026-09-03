@@ -1,5 +1,9 @@
 # Minimal by design: a Python base and this repo. No dependency tree to audit,
 # which is a peculiar thing to get wrong in a supply-chain security tool.
+#
+# Lives at the repo root because Wrangler uses the Dockerfile's own directory as
+# the build context, and the image needs both flagrante/ and server/ -- which
+# only exist together from here.
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \

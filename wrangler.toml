@@ -1,0 +1,32 @@
+# Scanner Worker + container.
+#
+# Wrangler builds with the Dockerfile's own directory as the context, not this
+# config's directory, so both live at the repo root. Putting the Dockerfile
+# under server/ fails: COPY flagrante/ has nothing to copy from there.
+#
+# The Pages project has its own config in web/. Two wrangler configs in one
+# repo is deliberate -- they are different products with different lifecycles.
+
+name = "flagrante-scan"
+main = "worker/index.js"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[containers]]
+class_name = "Scanner"
+image = "./Dockerfile"
+# One is enough at this stage, and it is also the cost ceiling: billing is per
+# 10ms of container runtime, so this caps what a traffic spike -- or a bad
+# actor -- can spend.
+max_instances = 1
+
+[[durable_objects.bindings]]
+name = "SCANNER"
+class_name = "Scanner"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Scanner"]
