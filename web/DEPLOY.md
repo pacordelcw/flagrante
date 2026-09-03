@@ -151,6 +151,17 @@ WHERE v.scans > 0
 GROUP BY v.price_bucket;
 ```
 
+### Bots are already in the visitor table
+
+Within seconds of the certificate being issued, crawlers that watch Certificate
+Transparency logs began loading the page and firing the visit ping — eleven of
+them before a single human had the URL. They will keep arriving.
+
+Both gates are insulated from this by construction, because both filter on
+`scans > 0` and a crawler does not upload an SBOM. `visitor.visits` is
+therefore inflated and should not be read as human traffic; only rows with
+`scans > 0` mean anything. Do not "fix" this by counting page views.
+
 ### What the return number is not
 
 `visitor.id` is a random value in one browser's localStorage. A person who

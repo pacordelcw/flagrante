@@ -1,8 +1,20 @@
 name = "flagrante"
 compatibility_date = "2026-09-01"
-pages_build_output_dir = "."
+# Only ./public is published. An exclusion list was the wrong tool here --
+# .assetsignore is a Workers mechanism, not a Pages one, and with the output dir
+# set to "." this file and schema.sql were served verbatim. Publishing a
+# directory that contains nothing but public assets cannot leak by omission.
+pages_build_output_dir = "public"
 
+# The account id lives in CLOUDFLARE_ACCOUNT_ID, not here: Pages projects reject
+# it in configuration, and keeping it out of the repo is the better default for
+# a public repository anyway.
+
+# Created with primary_location_hint = "weur". The waitlist holds email
+# addresses belonging to EU manufacturers, and storing EU personal data outside
+# the EU while selling EU compliance tooling is a contradiction a buyer would
+# notice before we did.
 [[d1_databases]]
 binding = "DB"
 database_name = "flagrante"
-database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"
+database_id = "a565eb6c-37a8-4f86-9060-3046869abcdb"
