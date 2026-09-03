@@ -36,7 +36,11 @@ jobs:
           python-version: "3.12"
       - name: Scan the sample against real feeds
         run: |
-          python -m redhand.cli samples/sample-cyclonedx.json --json > result.json
+          # --fail-on never matters here: the sample deliberately contains
+          # Log4Shell, so a default run exits 1 by design and `bash -e` would
+          # kill the step before any assertion ran. We want the findings, not
+          # the gate.
+          python -m redhand.cli samples/sample-cyclonedx.json --json --fail-on never > result.json
           python - <<'PY'
           import json, sys
           r = json.load(open("result.json"))
