@@ -10,11 +10,15 @@ WORKDIR /srv
 COPY flagrante/ ./flagrante/
 COPY server/app.py ./server/app.py
 
-# Run unprivileged. /tmp is the only writable path the process needs, and it
-# holds nothing but the public KEV feed cache.
+# Run unprivileged, and leave the application code owned by root so the running
+# service cannot rewrite its own source. The cache directory is the only path
+# the process needs to write, and it holds nothing but the public CISA KEV feed
+# -- an uploaded SBOM is never written anywhere.
 RUN useradd --system --uid 10001 flagrante \
  && mkdir -p /tmp/flagrante-cache \
- && chown -R flagrante:flagrante /srv /tmp/flagrante-cache
+ && chown -R flagrante:flagrante /tmp/flagrante-cache \
+ && chown -R root:root /srv \
+ && chmod -R go-w /srv
 USER flagrante
 
 EXPOSE 8080

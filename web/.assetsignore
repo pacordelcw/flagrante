@@ -1,0 +1,8 @@
+# Belt and braces: nothing here should ever reach the published site even if a
+# stray install happens inside web/. Pages serves this directory verbatim.
+node_modules
+package.json
+package-lock.json
+DEPLOY.md
+schema.sql
+wrangler.toml

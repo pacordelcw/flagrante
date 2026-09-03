@@ -9,3 +9,8 @@ dist/
 result.json
 sbom.json
 web/example-result.html
+
+# Deploy tooling, never part of the published site.
+node_modules/
+package.json
+package-lock.json
