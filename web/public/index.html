@@ -638,8 +638,10 @@ window.FLAGRANTE = (function () {
   function survey() {
     return '<div class="survey" id="survey">' +
       '<h4>Two optional questions</h4>' +
-      '<p class="q">They tell us who this is actually for. No email, nothing identifying, ' +
-      'and skipping them changes nothing about your result.</p>' +
+      '<p class="q">They tell us who this is actually for. Stored with no identifier ' +
+      'at all, which is what keeps them anonymous - and also means we could never ' +
+      'find yours to delete it, so please do not type anything that identifies you. ' +
+      'Skipping them changes nothing about your result.</p>' +
       '<label for="s-makes">What do you make?</label>' +
       '<input id="s-makes" maxlength="120" placeholder="industrial controllers, a SaaS platform, medical devices...">' +
       '<label for="s-doing">What are you doing today about Article 14 reporting?</label>' +

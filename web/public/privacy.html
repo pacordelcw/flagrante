@@ -136,7 +136,7 @@ footer.end a{color:var(--muted)}
     </tr>
     <tr>
       <td><strong>Two optional survey answers</strong> after a scan</td>
-      <td>To learn what kind of company this is actually for. Stored with the counts from your scan, never the component list.</td>
+      <td>To learn what kind of company this is actually for. Stored with the counts from your scan, never the component list, and <strong>with no identifier at all</strong> &mdash; not your email, not the random number, nothing that links the answer to you or to any other answer.</td>
       <td>Consent — the questions are optional and skipping them changes nothing</td>
       <td>Until the project is abandoned</td>
     </tr>
@@ -172,8 +172,15 @@ footer.end a{color:var(--muted)}
   <h3>Delete this browser's record now</h3>
   <p class="id" id="forget-id">Checking what is stored for this browser...</p>
   <p>This erases the random number from your browser and deletes the matching row
-  from the database. No email, no ticket, no waiting. It cannot delete a waitlist
-  entry, because that is tied to your email address rather than to this browser.</p>
+  from the database. No email, no ticket, no waiting.</p>
+  <p>Two things it does not reach, stated plainly rather than left for you to
+  discover. A <strong>waitlist entry</strong> is tied to your email address rather
+  than to this browser, so ask us by email instead. And the <strong>survey
+  answers</strong> carry no identifier by design, which is what makes them
+  anonymous &mdash; the same property means we genuinely cannot find yours to
+  delete it, and neither can anyone else. That is why the questions ask what you
+  build rather than who you are, and why you should not type anything into them
+  that identifies you.</p>
   <button type="button" id="forget-btn">Delete it</button>
   <p class="msg" id="forget-msg"></p>
 </div>
