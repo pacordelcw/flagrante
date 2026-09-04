@@ -86,6 +86,17 @@ pre code{background:none;padding:0;font-size:13px;line-height:1.7}
 footer.end{border-top:1px solid var(--rule);margin-top:44px;padding:24px 0 0;
   font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--faint);line-height:1.8}
 footer.end a{color:var(--muted)}
+.consent{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--panel);
+  border-top:2px solid var(--ink);padding:18px 24px;display:none}
+.consent.show{display:block}
+.consent-in{max-width:760px;margin:0 auto;display:flex;gap:18px;align-items:center;
+  justify-content:space-between;flex-wrap:wrap}
+.consent p{margin:0;font-size:14px;color:var(--muted);max-width:58ch;line-height:1.55}
+.consent p strong{color:var(--ink);font-weight:600}
+.consent .acts{display:flex;gap:9px;flex-shrink:0}
+.consent button{padding:9px 18px;font-family:Chivo,sans-serif;font-size:14.5px;font-weight:600;
+  cursor:pointer;border:1px solid var(--rule-firm);background:var(--ground);color:var(--ink)}
+.consent button.yes{background:var(--caught);border-color:var(--caught);color:#fff}
 </style>
 </head>
 <body>
@@ -219,5 +230,72 @@ somewhere started using a weakness in it. Your build did not move. The world did
   <a href="/privacy">Privacy</a> &middot; <a href="https://github.com/pacordelcw/flagrante">Source</a>
 </footer>
 </div>
+<div class="consent" id="consent" role="dialog" aria-live="polite" aria-label="Measurement consent">
+  <div class="consent-in">
+    <p>
+      May we keep <strong>one random number in your browser</strong> so we can tell a
+      returning reader from a new one, and see which writing brings people here?
+      No cookies, no account, no email, no IP address, nothing that identifies you
+      &mdash; and the page reads the same either way. <a href="/privacy">What we collect</a>.
+    </p>
+    <div class="acts">
+      <button type="button" id="consent-no">No thanks</button>
+      <button type="button" class="yes" id="consent-yes">Allow</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Measurement for the writing. Identical consent rules to the landing: no
+   identifier is generated, stored or sent until someone agrees, declining
+   erases anything already there, and the article reads the same either way.
+   The referring host is what this exists to capture -- an arrival from a search
+   engine is the only evidence that the content channel works at all. */
+(function () {
+  var ID = 'flagrante.vid', CONSENT = 'flagrante.consent';
+  function put(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function newId(){
+    try { var b=new Uint8Array(12); crypto.getRandomValues(b);
+      return Array.prototype.map.call(b,function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
+    } catch(e){ return (Date.now().toString(36)+Math.random().toString(36).slice(2,14))
+      .replace(/[^a-z0-9]/g,'').slice(0,24); }
+  }
+  var consent = get(CONSENT), id = consent === 'yes' ? get(ID) : null;
+
+  function ping(){
+    if (consent !== 'yes') return;
+    if (!id) { id = newId(); put(ID, id); }
+    try {
+      fetch('/api/visit', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id:id, event:'visit' }), keepalive:true }).catch(function(){});
+    } catch(e){}
+  }
+  function forget(prev){
+    try { localStorage.removeItem(ID); localStorage.removeItem('flagrante.bucket'); } catch(e){}
+    if (!prev) return;
+    try { fetch('/api/forget', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id:prev }), keepalive:true }).catch(function(){}); } catch(e){}
+  }
+  function decide(a){
+    var prev = id || get(ID);
+    consent = a; put(CONSENT, a);
+    var box = document.getElementById('consent');
+    if (box) box.classList.remove('show');
+    if (a === 'yes') ping(); else { id = null; forget(prev); }
+  }
+  function wire(){
+    var box = document.getElementById('consent');
+    if (!box) return;
+    document.getElementById('consent-yes').addEventListener('click',function(){decide('yes');});
+    document.getElementById('consent-no').addEventListener('click',function(){decide('no');});
+    if (consent !== 'yes' && consent !== 'no') box.classList.add('show');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+  ping();
+})();
+</script>
+
 </body>
 </html>

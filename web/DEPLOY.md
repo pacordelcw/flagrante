@@ -213,6 +213,46 @@ WHERE v.scans > 0
 GROUP BY v.price_bucket;
 ```
 
+### Reading whether the writing works
+
+The articles carry the same consent-gated tracking as the landing, which exists
+for one field: `first_referer`. An arrival from a search engine is the only
+evidence that the content channel works, and until 3 September the article pages
+carried no measurement at all — anyone arriving from search read and left
+invisibly.
+
+```sql
+-- Where readers come from. A search engine host here is the whole signal.
+SELECT coalesce(first_referer, 'direct') AS source,
+       count(*) AS people,
+       sum(CASE WHEN scans > 0 THEN 1 ELSE 0 END) AS then_scanned
+FROM visitor
+GROUP BY source ORDER BY people DESC;
+
+-- Does the writing convert, or only entertain? Compares people who arrived
+-- from search against everyone else.
+SELECT CASE WHEN first_referer LIKE '%google%'
+            OR first_referer LIKE '%bing%'
+            OR first_referer LIKE '%duckduckgo%' THEN 'from search'
+            ELSE 'other' END AS arrival,
+       count(*) AS people,
+       round(100.0 * sum(CASE WHEN scans > 0 THEN 1 ELSE 0 END) / count(*), 1) AS pct_scanned
+FROM visitor GROUP BY arrival;
+```
+
+**What this cannot tell you.** It sees people who arrived, not people who were
+shown. Impressions, average position and the queries you appear for live only in
+Google Search Console, which needs the domain verified — half the funnel is
+invisible without it.
+
+**And a timing caveat worth writing down before the data disappoints anyone.** A
+domain registered on 3 September 2026, with no backlinks and three articles, will
+be indexed in days and ranked over months. Gate 1 reports in four weeks. If there
+is no organic traffic by then **that is not evidence the channel fails** — it is
+the latency we already knew about. An honest read on SEO arrives around month
+three, which is a different clock from the product gates and should not be
+collapsed into them.
+
 ### Bots are already in the visitor table
 
 Within seconds of the certificate being issued, crawlers that watch Certificate
