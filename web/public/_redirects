@@ -1,0 +1,4 @@
+# Cloudflare Pages canonicalises .html to extensionless with a 308. Google's
+# site-verification fetcher wants the exact URL it gave us, so serve that path
+# as a rewrite (200) instead of a redirect.
+/google5b8776a055a23ff8.html  /google5b8776a055a23ff8  200
