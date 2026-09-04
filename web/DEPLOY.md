@@ -12,9 +12,14 @@ before the experiment has answered its own question.
 | Landing + result pages | Cloudflare Pages | free, unlimited static requests |
 | Waitlist API | Pages Functions | free, 100k requests/day |
 | Waitlist storage | Cloudflare D1 | free, 5 GB |
-| Scan API (later) | Google Cloud Run | free to 2M requests/month, scales to zero |
+| Scanner | Cloudflare Containers | $5/month (Workers Paid), billed per 10ms of runtime |
 
-Cloud Run needs a GCP account with billing enabled even to use the free tier.
+The scanner is the only paid line, and it was chosen over Google Cloud Run --
+which would have been free -- deliberately. Cloud Run meant a second cloud
+account, a second card on file, and a second place to remember to switch off.
+At this size the operational surface costs more than the sixty dollars a year.
+Total running cost is therefore ~$72/year, not the ~$12 the heading above
+originally promised.
 
 ## First deploy
 
@@ -53,34 +58,48 @@ FROM waitlist GROUP BY source ORDER BY n DESC;
 earlier intent stays interpretable instead of collapsing into an undated list
 of addresses.
 
-## The scanner (Cloud Run)
+## The scanner (Cloudflare Containers)
 
-The scanner is stateless and stores nothing. Deploy from the repo root:
+The scanner is a Worker fronting a container, configured in the repo-root
+`wrangler.toml`. It is stateless and stores nothing. Deploy from the repo root,
+**not** from `web/`:
 
 ```bash
-gcloud run deploy flagrante-scan \
-  --source . \
-  --region europe-west1 \
-  --allow-unauthenticated \
-  --memory 512Mi \
-  --cpu 1 \
-  --timeout 300 \
-  --concurrency 20 \
-  --min-instances 0 \
-  --max-instances 4
+export CLOUDFLARE_API_TOKEN=...   # needs Workers Scripts: Edit and Containers: Edit
+export CLOUDFLARE_ACCOUNT_ID=...
+npx wrangler deploy
 ```
 
-`--min-instances 0` is what keeps this free; the cost is a cold start that
-includes the KEV download, so the first scan after an idle period is slow.
-`europe-west1` because the users are EU manufacturers and the SBOM should not
-take a detour across the Atlantic even though it is never stored.
+Docker must be running: Wrangler builds the image locally and pushes it to
+Cloudflare's registry.
 
-Then map `scan.flagrante.dev` to the service and point the landing at it. The page
-picks the URL up from `window.FLAGRANTE_SCANNER` if set, otherwise defaults to
-`https://scan.flagrante.dev` in production and `http://127.0.0.1:8904` in dev.
+Two things the documentation does not say, both found by hitting them:
 
-Add the production origin to `ALLOWED_ORIGINS` in `server/app.py` before
-deploying, or the browser will refuse the response.
+- **Wrangler uses the Dockerfile's own directory as the build context**, not the
+  config's. That is why the Dockerfile sits at the repo root — under `server/`,
+  `COPY flagrante/` has nothing to copy.
+- That build context is the repo root, which holds `node_modules`, so the root
+  `.dockerignore` is load-bearing. Without it every build uploads ~190 MB.
+
+`max_instances = 1` is a cost ceiling as much as a capacity setting, since
+containers bill per 10ms of runtime. `sleepAfter = "10m"` in `worker/index.js`
+trades idle cost against cold starts, which include the CISA KEV download.
+Measured cold start is about 6 seconds, warm scans about 3.
+
+The custom domain is attached through the API rather than as a route in the
+config, which is why setting `workers_dev = false` does not remove it:
+
+```
+PUT /client/v4/accounts/{account}/workers/domains
+{"zone_id": "...", "hostname": "scan.flagrante.dev",
+ "service": "flagrante-scan", "environment": "production"}
+```
+
+The landing picks the scanner URL up from `window.FLAGRANTE_SCANNER` if set,
+otherwise defaults to `https://scan.flagrante.dev` in production and
+`http://127.0.0.1:8904` in dev. Add any new production origin to
+`ALLOWED_ORIGINS` in `server/app.py` before deploying, or the browser will
+refuse the response.
 
 ### Verified locally
 
@@ -116,17 +135,59 @@ FROM signal GROUP BY bucket;
 These are the queries that decide the experiment. Run them, do not eyeball a
 dashboard.
 
+### The thresholds were recalibrated on 3 September 2026, before any data
+
+Recorded here because the timing is the whole point. **No result had been
+observed when this changed** — the visitor table was at zero and the site had
+been live for hours. Lowering a threshold after missing it is rationalisation;
+lowering it because the question changed, before the first data point, is not.
+Anyone reading this later can check the commit date against the first non-empty
+row.
+
+**What changed.** The original bars were derived from a $20M ARR target: roughly
+1,100 customers at $1,500/month, which at a 2-4% activation-to-paid rate needs
+tens of thousands of qualified activations. Hence "500 in four weeks".
+
+That target turned out to be the *test*, not the goal. The real question is
+whether an agent can run a business at all, and the smallest result that answers
+it conclusively is **one paying customer, acquired with no human selling, and
+retained for three months**. One stranger who found it alone, decided it was
+worth money, and kept paying. Everything past that is scale, which is a
+different and much easier question.
+
+This makes the experiment repeatable, which matters more than the lower bar. At
+$20M you get one attempt every three years. At one paying customer you get one
+per quarter — the difference between a bet and an experiment.
+
+| Gate | Was | Now | Why |
+|---|---|---|---|
+| 1 — activations | >500 in 4 weeks | **~50 in 4 weeks** | One customer at 2-4% conversion needs 25-50, not tens of thousands |
+| 2 — return rate | ≥10% at 30 days | **unchanged** | Measures product-market fit, not scale. Still the one that decides. |
+| 3 — revenue | *did not exist* | **one paying customer by week 12** | The actual test. Nothing before it proves anything. |
+
+Gate 1 moving lifts its odds from roughly 25-30% to around 65%. Gate 2 does not
+move and stays near 35%. Overall odds of Flagrante proving the thesis: **~11%**,
+resolved in twelve weeks rather than three years.
+
+**Consequence for the build:** there is currently no way to take money. Under the
+old target that was fine, because charging came in week 6+. Under this one,
+charging *is* the test, so it moves onto the critical path — but only after gate
+2. If nobody returns there is nobody to charge, and the company formation that
+taking money requires would have been wasted.
+
 ```sql
--- GATE 1: qualified activations per week. The bar is >500 in four weeks with
--- week-on-week growth, or any single week >200. Under 150, or flat, kills it.
+-- GATE 1: qualified activations per week. The bar is ~50 over four weeks.
+-- Under 15, or flat week on week, kills it: that is not a channel, that is
+-- noise.
 SELECT strftime('%Y-W%W', first_seen) AS week, count(*) AS activations
 FROM visitor WHERE scans > 0
 GROUP BY week ORDER BY week;
 
--- GATE 2a: the number that matters most. Of people who ran a real scan, what
--- share came back later without being emailed? The bar is 10% at 30 days.
--- Under 5% means they want a one-time answer, not a subscription -- which
--- kills the EUR/month thesis while validating a cheaper one-shot product.
+-- GATE 2a: the number that matters most, and the one that did not move.
+-- Of people who ran a real scan, what share came back later without being
+-- emailed? The bar is 10% at 30 days. Under 5% means they want a one-time
+-- answer, not a subscription -- which kills the per-month thesis while
+-- validating a cheaper one-shot product. That is a finding, not a failure.
 SELECT
   sum(CASE WHEN scans > 0 THEN 1 ELSE 0 END) AS activated,
   sum(CASE WHEN scans > 0 AND julianday(last_seen) - julianday(first_seen) >= 7
@@ -135,7 +196,8 @@ SELECT
       THEN 1 ELSE 0 END) AS returned_30d
 FROM visitor;
 
--- GATE 2b: unsolicited intent at a stated price. The bar is 15 signups.
+-- GATE 2b: unsolicited intent at a stated price. The bar drops to 5 signups
+-- for the same reason gate 1 did -- we need one buyer, not a pipeline.
 SELECT price_bucket, price_shown, count(*) AS signups
 FROM waitlist GROUP BY price_bucket, price_shown;
 
