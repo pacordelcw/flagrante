@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A CVE in your product just hit CISA KEV. Here is what the next 24 hours actually look like — Flagrante</title>
+<meta name="description" content="Article 14 gives you 24 hours from awareness. Most guides explain the rule. This one is the runbook: what starts the clock, who decides, what the early warning must contain, and what to do when you are not sure.">
+<meta property="og:title" content="A CVE in your product just hit CISA KEV. Here is what the next 24 hours actually look like">
+<meta property="og:description" content="Article 14 gives you 24 hours from awareness. Most guides explain the rule. This one is the runbook: what starts the clock, who decides, what the early warning must contain, and what to do when you are not sure.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://flagrante.dev/writing/the-first-24-hours">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#FBFAF9; --panel:#FFFFFF; --sunk:#F1EFED;
+  --ink:#16130F; --muted:#5E574F; --faint:#8D857B;
+  --rule:#DFDAD4; --rule-firm:#C2BAB1;
+  --caught:#B32D22; --caught-wash:#FBEAE7;
+  --elevated:#8A5B00; --steady:#3F6B57;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#131210; --panel:#1B1917; --sunk:#221F1C;
+    --ink:#F0EBE4; --muted:#A79E93; --faint:#7A7269;
+    --rule:#2C2825; --rule-firm:#413B36;
+    --caught:#FF7A67; --caught-wash:#2E1A16;
+    --elevated:#E5A83C; --steady:#67B394;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131210; --panel:#1B1917; --sunk:#221F1C;
+  --ink:#F0EBE4; --muted:#A79E93; --faint:#7A7269;
+  --rule:#2C2825; --rule-firm:#413B36;
+  --caught:#FF7A67; --caught-wash:#2E1A16;
+  --elevated:#E5A83C; --steady:#67B394;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:Chivo,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased}
+.wrap{max-width:700px;margin:0 auto;padding:0 24px 90px}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace}
+code{font-size:.88em;background:var(--sunk);padding:2px 5px}
+a{color:var(--caught)}
+a:focus-visible{outline:2px solid var(--steady);outline-offset:2px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0;
+  border-bottom:1px solid var(--rule);gap:18px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--caught)}
+.top nav a{color:var(--muted);text-decoration:none;font-family:"JetBrains Mono",monospace;font-size:12px}
+h1{font-size:clamp(31px,5.2vw,44px);font-weight:800;letter-spacing:-.028em;line-height:1.08;
+  margin:52px 0 16px;text-wrap:balance}
+.dateline{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);
+  letter-spacing:.05em;margin:0 0 34px}
+.lede{font-size:20px;line-height:1.5;color:var(--muted);margin:0 0 32px}
+.lede strong{color:var(--ink);font-weight:600}
+h2{font-size:23px;font-weight:800;letter-spacing:-.02em;margin:44px 0 12px;line-height:1.25;text-wrap:balance}
+h3{font-size:17px;font-weight:700;margin:30px 0 8px}
+p{margin:0 0 17px}
+strong{font-weight:600}
+blockquote{margin:0 0 20px;padding:2px 0 2px 20px;border-left:3px solid var(--rule-firm);
+  color:var(--muted);font-size:16.5px}
+table{width:100%;border-collapse:collapse;border:1px solid var(--rule);background:var(--panel);
+  margin:0 0 22px;font-size:15px}
+th,td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--rule)}
+th{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;background:var(--sunk)}
+tr:last-child td{border-bottom:none}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hit{color:var(--caught);font-weight:600}
+ul,ol{margin:0 0 20px;padding-left:22px}
+li{margin-bottom:10px}
+pre{background:var(--panel);border:1px solid var(--rule);padding:16px 18px;overflow-x:auto;
+  margin:0 0 22px}
+pre code{background:none;padding:0;font-size:13px;line-height:1.7}
+.note{background:var(--panel);border-left:3px solid var(--steady);padding:18px 20px;margin:0 0 24px;
+  font-size:16px}
+.note p:last-child{margin:0}
+.note.warn{border-left-color:var(--caught);background:var(--caught-wash)}
+.cta{border:1px solid var(--rule-firm);background:var(--sunk);padding:24px;margin:38px 0 0}
+.cta p{margin:0 0 12px;font-size:16px}
+.cta p:last-child{margin:0}
+.cta code{background:var(--panel);border:1px solid var(--rule);padding:3px 8px}
+footer.end{border-top:1px solid var(--rule);margin-top:44px;padding:24px 0 0;
+  font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--faint);line-height:1.8}
+footer.end a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <a class="brand" href="/">Fla<span>grante</span></a>
+  <nav><a href="/">&larr; Flagrante</a></nav>
+</header>
+<h1>A CVE in your product just hit CISA KEV. Here is what the next 24 hours actually look like</h1>
+<p class="dateline">3 September 2026</p>
+<p class="lede">There is no shortage of writing explaining that the Cyber
+Resilience Act requires an early warning within 24 hours. There is very little on
+what those 24 hours contain. <strong>This is the second thing.</strong></p>
+
+<div class="note warn">
+<p>Nothing here is legal advice, and none of it substitutes for your own counsel or
+your own assessment. It is an operational sketch of a procedure that, on
+11 September 2026, became something you may have to execute at short notice.</p>
+</div>
+
+<h2>Hour 0: what actually starts it</h2>
+
+<p>The clock starts when you become <em>aware</em> that a vulnerability
+<em>contained in your product</em> is <em>actively exploited</em>. Three conditions,
+and all three matter:</p>
+
+<ul>
+  <li><strong>Actively exploited</strong> is not the same as severe, or public, or
+  proof-of-concept. It requires reliable evidence that a malicious actor has
+  exploited it in the wild. A CVSS 9.8 with no exploitation does not start a clock.</li>
+  <li><strong>Contained in your product</strong> is your judgement, not the feed's.
+  A KEV listing tells you the vulnerability is exploited somewhere in the world. It
+  does not tell you the vulnerable code path is reachable in your build, or that the
+  affected version is the one you ship.</li>
+  <li><strong>Awareness</strong> is the part people underestimate. It is not "when
+  we ran the scan". If a component of yours entered KEV three weeks ago and you had
+  no process that would have noticed, the defensible position is not that your clock
+  started today.</li>
+</ul>
+
+<p>Which is why "we scan quarterly" is a worse answer than it sounds. The interval
+between exploitation becoming public and you noticing is the part of the timeline
+you control, and it is the part a regulator can most easily inspect.</p>
+
+<h2>Hours 0–2: decide, and write down why</h2>
+
+<p>The single most useful artefact from this phase is not the report. It is the
+record of the decision.</p>
+
+<ol>
+  <li><strong>Confirm the version.</strong> KEV entries name a product, not your
+  build. Does the affected version range include what you actually ship, in the
+  releases still under support?</li>
+  <li><strong>Confirm reachability, or accept that you cannot.</strong> Is the
+  vulnerable path present and callable in your product as configured? If you cannot
+  determine this within the window, the conservative reading is to report — the
+  regulation does not offer "we were still investigating" as a reason for silence.</li>
+  <li><strong>Write the reasoning down with a timestamp, whichever way you go.</strong>
+  A decision not to report, recorded with its basis at the time, is a defensible
+  position. The same decision, unrecorded, is indistinguishable from not having
+  noticed.</li>
+</ol>
+
+<h2>Hours 2–24: the early warning</h2>
+
+<p>The early warning goes to the CSIRT designated as coordinator for the Member
+State of your main establishment, and to ENISA, through the Single Reporting
+Platform. It is deliberately short — it is a warning, not a full analysis.</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>The vulnerability</td><td>CVE identifier, and what the product is</td></tr>
+    <tr><td>Whether it is actively exploited</td><td>This is the trigger; say what your evidence is</td></tr>
+    <tr><td>Member States affected</td><td>Where the product is made available, to the best of your knowledge</td></tr>
+    <tr><td>Corrective measures</td><td>What you have done or plan to do, even if the answer is "assessment in progress"</td></tr>
+    <tr><td>Manufacturer and contact</td><td>Legal manufacturer, and a human who can be reached</td></tr>
+  </tbody>
+</table>
+
+<p>An early warning that says "we are aware, we are assessing, here is who to call"
+is a valid early warning. Waiting until you have a complete picture is how the
+24 hours get missed.</p>
+
+<h2>What comes after</h2>
+
+<table>
+  <thead><tr><th>When</th><th>What</th></tr></thead>
+  <tbody>
+    <tr><td class="n">24 hours</td><td>Early warning</td></tr>
+    <tr><td class="n">72 hours</td><td>Vulnerability notification — fuller detail, severity, impact, any mitigations available</td></tr>
+    <tr><td class="n">14 days</td><td>Final report, once a corrective measure exists</td></tr>
+  </tbody>
+</table>
+
+<p>All three run from awareness, not from each other, and not from when you finished
+investigating.</p>
+
+<h2>The part you can prepare in advance</h2>
+
+<p>Almost none of the above is doable at speed unless three things already exist
+before the day you need them:</p>
+
+<ul>
+  <li><strong>An SBOM per release, retrievable.</strong> If answering "do we ship
+  this component" takes a day, the 24 hours are gone before the question is settled.
+  Generate it in CI and attach it to the release; syft and cdxgen do this free.</li>
+  <li><strong>A named owner and an out-of-hours path.</strong> Exploitation does not
+  arrive on Tuesday morning. Someone has to be able to make the call, and the
+  regulator's clock does not pause for a weekend.</li>
+  <li><strong>Continuous checking against exploitation, not severity.</strong> The
+  triggering event happens on someone else's schedule: a CVE you already knew about
+  becomes reportable the moment it starts being exploited, with no change on your
+  side at all. That is the case a quarterly scan cannot catch by construction.</li>
+</ul>
+
+<p>The last one is worth restating, because it is the one that surprises people.
+Nothing has to change in your code for a reporting obligation to appear. A component
+you shipped two years ago, unchanged, becomes reportable because an attacker
+somewhere started using a weakness in it. Your build did not move. The world did.</p>
+<div class="cta">
+  <p><strong>Flagrante</strong> reads an SBOM and tells you which components carry a
+  vulnerability CISA says is being exploited &mdash; the ones that start an Article 14
+  clock, separated from the thousands that do not.</p>
+  <p><code>pip install flagrante</code> &nbsp;then&nbsp; <code>syft dir:. -o cyclonedx-json | flagrante</code></p>
+  <p>Or <a href="/#scan">drop an SBOM in the browser</a>. It is never stored, anywhere.</p>
+</div>
+<footer class="end">
+  Exposure indicator only. Not a conformity assessment, not legal advice, and not a
+  determination that no reporting obligation exists.<br>
+  <a href="/privacy">Privacy</a> &middot; <a href="https://github.com/pacordelcw/flagrante">Source</a>
+</footer>
+</div>
+</body>
+</html>
